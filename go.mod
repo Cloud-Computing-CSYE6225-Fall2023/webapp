@@ -1,4 +1,4 @@
-module github.com/shivasaicharanruthala
+module github.com/shivasaicharanruthala/webapp
 
 go 1.21.1
 

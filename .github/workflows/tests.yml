@@ -38,12 +38,6 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Configure private token
-        env:
-          GH_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-        run: |
-            echo ${{ secrets.GH_ACCESS_TOKEN }}
-            git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
       - name: Set up Go 1.21.1
         id: go
         uses: actions/setup-go@v4

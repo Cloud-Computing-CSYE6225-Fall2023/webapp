@@ -1,0 +1,2 @@
+DROP INDEX IF EXISTS idx_password;
+DROP TABLE IF EXISTS accounts;

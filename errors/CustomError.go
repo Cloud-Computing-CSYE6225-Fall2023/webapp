@@ -17,6 +17,10 @@ func NewCustomError(err error, statusCode ...int) CustomError {
 		code = statusCode[0]
 	}
 
+	if err.Error() == "dial tcp [::1]:5432: connect: connection refused" {
+		code = 503
+	}
+
 	return CustomError{
 		Err:        err,
 		Msg:        err.Error(),

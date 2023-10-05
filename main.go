@@ -53,7 +53,7 @@ func main() {
 	}
 
 	// Run Migrations
-	if err != nil {
+	if err == nil {
 		driver, err := postgres.WithInstance(db, &postgres.Config{})
 		if err != nil {
 			fmt.Printf("ERROR: Connecting to database for migration failed with error %v", err.Error())
@@ -66,7 +66,7 @@ func main() {
 			//panic(errors.NewCustomError(err))
 		}
 
-		if m != nil && err != nil {
+		if m != nil && err == nil {
 			err = m.Up()
 			if err != nil {
 				if err.Error() != "no change" {
@@ -91,7 +91,7 @@ func main() {
 
 	// Load test user accounts from a given file
 	fileName := os.Getenv("USER_DATA_FILE_PATH")
-	if err != nil {
+	if err == nil {
 		if err = accntSvc.BulkInsert(fileName); err != nil {
 			fmt.Printf("ERROR: Loading users data to database failed with error %v", err.Error())
 			//panic(errors.NewCustomError(err))

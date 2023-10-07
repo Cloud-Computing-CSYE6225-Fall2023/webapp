@@ -103,7 +103,7 @@ func main() {
 	router.MethodNotAllowedHandler = http.HandlerFunc(MethodNotImplementedHandler)
 
 	// Health Check Route
-	router.HandleFunc("/healthz", HealthCheckHandler).Methods("GET")
+	router.HandleFunc("/health", HealthCheckHandler).Methods("GET")
 
 	// Accounts Route
 	//router.HandleFunc("/v1/account", accountHandler.Insert).Methods("POST")

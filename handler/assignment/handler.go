@@ -3,6 +3,7 @@ package assignment
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/shivasaicharanruthala/webapp/errors"
 	"io"
 	"net/http"
 
@@ -86,12 +87,14 @@ func (a *assignmentService) Insert(w http.ResponseWriter, r *http.Request, user 
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
+		err = errors.NewCustomError(err, 400)
 		responder.SetErrorResponse(err, w)
 		return
 	}
 
 	err = json.Unmarshal(body, &assignment)
 	if err != nil {
+		err = errors.NewCustomError(err, 400)
 		responder.SetErrorResponse(err, w)
 		return
 	}
@@ -118,12 +121,14 @@ func (a *assignmentService) Modify(w http.ResponseWriter, r *http.Request, user 
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
+		err = errors.NewCustomError(err, 400)
 		responder.SetErrorResponse(err, w)
 		return
 	}
 
 	err = json.Unmarshal(body, &assignment)
 	if err != nil {
+		err = errors.NewCustomError(err, 400)
 		responder.SetErrorResponse(err, w)
 		return
 	}

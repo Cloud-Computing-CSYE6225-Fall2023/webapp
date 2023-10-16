@@ -1,4 +1,4 @@
-name: webapp
+name: webapp-packer-validation
 
 on:
   pull_request:
@@ -6,6 +6,9 @@ on:
       - main
     types:
       - opened
+  push:
+    branches:
+      - main
 
 jobs:
   setup-go:

@@ -13,7 +13,7 @@ jobs:
     name: setup-go
     runs-on: ubuntu-latest
     env:
-      SERV_ADDR: ${{ env.SERV_ADDR }}
+      SERV_ADDR: ${{ vars.SERV_ADDR }}
       PORT: ${{ vars.PORT }}
       POSTGRESQL_CONNECTION_STRING: ${{ vars.POSTGRESQL_CONNECTION_STRING }}
       DB_NAME: ${{ vars.DB_NAME }}
@@ -49,7 +49,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          echo "repository variable 1: $SERV_ADDR"
+          echo "repository variable 1: ${{env.SERV_ADDR}}"
           echo "repository variable 2: $PORT"
           echo "repository variable 3: $POSTGRESQL_CONNECTION_STRING"
           echo "repository variable 4: $DB_NAME"

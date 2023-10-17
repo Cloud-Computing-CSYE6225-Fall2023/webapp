@@ -37,6 +37,8 @@ fi
 
 # Update the package list
 sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get clean
 
 # Install Node to run integration tests
 sudo apt install nodejs npm -y

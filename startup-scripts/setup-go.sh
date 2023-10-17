@@ -6,6 +6,10 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Update packages
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get clean
 
 # Install Go
 echo "Installing the latest version of Go..."

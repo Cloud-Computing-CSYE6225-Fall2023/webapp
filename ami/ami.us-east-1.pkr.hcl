@@ -8,61 +8,43 @@ packer {
 }
 
 variable "aws_region" {
-  type    = string
+  type = string
   default = "us-east-1"
 }
 
 variable "source_ami" {
-  type    = string
+  type = string
   default = "ami-06db4d78cb1d3bbf9"
-}
-
-variable "access_key_id" {
-  type    = string
-}
-
-variable "secret_access_key" {
-  type    = string
-}
-
-variable "ssh_username" {
-  type    = string
-}
-
-variable "subnet_id" {
-  type    = string
-}
-
-variable "PCKR_DB_USER" {
-  type    = string
-}
-
-variable "PCKR_DB_PASSWORD" {
-  type    = string
-}
-
-variable "PCKR_DB_NAME" {
-  type    = string
-}
-
-variable "instance_type" {
-  type    = string
 }
 
 variable "ami_users" {
   type = string
+  default = ""
+}
+
+variable "ssh_username" {
+  type = string
+  default = "admin"
+}
+
+variable "instance_type" {
+  type = string
+  default = "t2.micro"
 }
 
 variable "device_name" {
   type = string
+  default = "/dev/xvda"
 }
 
 variable "volume_size" {
   type = number
+  default = 8
 }
 
 variable "volume_type" {
   type = string
+  default = "gp2"
 }
 
 source "amazon-ebs" "my-ami" {
@@ -90,16 +72,13 @@ source "amazon-ebs" "my-ami" {
   }
 
   instance_type = "${var.instance_type}"
-  subnet_id     = "${var.subnet_id}"
-  access_key    = "${var.access_key_id}"
-  secret_key    = "${var.secret_access_key}"
   ssh_username  = "${var.ssh_username}"
   ami_users     = ["${var.ami_users}"]
 
   launch_block_device_mappings {
     delete_on_termination = true
     device_name           = "${var.device_name}"
-    volume_size           = 8
+    volume_size           = var.volume_size
     volume_type           = "${var.volume_type}"
   }
 }
@@ -129,12 +108,6 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "PCKR_DB_USER=${var.PCKR_DB_USER}",
-      "PCKR_DB_PASSWORD=${var.PCKR_DB_PASSWORD}",
-      "PCKR_DB_NAME=${var.PCKR_DB_NAME}"
-    ]
-
     inline = [
       "cd github.com/shivasaicharanruthala",
       "sudo unzip -q webapp.zip",
@@ -146,7 +119,7 @@ build {
       "export PATH=$PATH:/usr/local/go/bin",
       "export GOPATH=/home/admin/github.com/shivasaicharanruthala",
       "go version",
-      "sudo ./startup-scripts/setup-postgres.sh -u $PCKR_DB_USER -p $PCKR_DB_PASSWORD -d $PCKR_DB_NAME",
+      "sudo ./startup-scripts/setup-postgres.sh -u $PKR_VAR_DB_USER -p $PKR_VAR_DB_PASSWORD -d $PKR_VAR_DB_NAME",
       "go get -v ./..."
     ]
   }

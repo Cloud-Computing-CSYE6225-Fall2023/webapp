@@ -1,4 +1,4 @@
-name: Setup Go & Validate Packer on PR
+name: Setup Go & Run Integration Tests
 
 on:
   pull_request:
@@ -49,16 +49,6 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          echo "repository variable 1: ${{env.SERV_ADDR}}"
-          echo "repository variable 2: $PORT"
-          echo "repository variable 3: $POSTGRESQL_CONNECTION_STRING"
-          echo "repository variable 4: $DB_NAME"
-          echo "repository variable 5: $DRIVER_NAME"
-          echo "repository variable 6: $USER_DATA_FILE_PATH"
-          echo "repository variable 7: $MIGRATION_FILE_PATH"
-          echo "repository variable 8: $POSTGRES_DB"
-          echo "repository variable 9: $POSTGRES_PASSWORD"
-          
           go get -v ./...
 
       - name: Integration Tests
@@ -71,6 +61,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up Go 1.21.1
+        id: go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21.1
+
       - name: Checkout Code
         uses: actions/checkout@v2
 
@@ -88,9 +84,18 @@ jobs:
 
       - name: Packer Format
         run: |
-          ls
-          packer fmt -check .
+          cd ami
+          packer fmt .
+
+      - name: Build Go Application
+        run: |
+          go build -o webapp
+
+      - name: Zip Dependencies
+        run: |
+          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod
 
       - name: Packer Validate
         run: |
+          cd ami
           packer validate .

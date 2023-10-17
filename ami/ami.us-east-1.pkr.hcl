@@ -58,7 +58,7 @@ variable "device_name" {
 }
 
 variable "volume_size" {
-  type = int
+  type = number
 }
 
 variable "volume_type" {

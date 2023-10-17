@@ -1,4 +1,4 @@
-name: webapp-packer-validation-on-merge
+name: Packer Build
 
 on:
   pull_request:
@@ -13,20 +13,20 @@ jobs:
     name: setup-go
     runs-on: ubuntu-latest
     env:
-      SERV_ADDR: "localhost"
-      PORT: 8080
-      POSTGRESQL_CONNECTION_STRING: "postgres://postgres:mysecretpassword@localhost:5432/assignments_submission?sslmode=disable"
-      DB_NAME: "assignments_submission"
-      DRIVER_NAME: "postgres"
-      USER_DATA_FILE_PATH: "./opt/users.csv"
-      MIGRATION_FILE_PATH: "file://./migrations/"
+      SERV_ADDR: ${{ vars.SERV_ADDR }}
+      PORT: ${{ vars.PORT }}
+      POSTGRESQL_CONNECTION_STRING: ${{ vars.POSTGRESQL_CONNECTION_STRING }}
+      DB_NAME: ${{ vars.DB_NAME }}
+      DRIVER_NAME: ${{ vars.DRIVER_NAME }}
+      USER_DATA_FILE_PATH: ${{ vars.USER_DATA_FILE_PATH }}
+      MIGRATION_FILE_PATH: ${{ vars.MIGRATION_FILE_PATH }}
 
     services:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: "assignments_submission"
-          POSTGRES_PASSWORD: "mysecretpassword"
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
@@ -49,9 +49,9 @@ jobs:
 
       - name: Install Packer
         run: |
-          wget https://releases.hashicorp.com/packer/1.7.5/packer_1.7.5_linux_amd64.zip
-          unzip packer_1.7.5_linux_amd64.zip
-          sudo mv packer /usr/local/bin/
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install packer
 
       - name: Build Go Application
         run: |

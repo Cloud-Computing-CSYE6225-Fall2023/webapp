@@ -88,10 +88,9 @@ jobs:
 
       - name: Packer Format
         run: |
-          cd ami
+          ls
           packer fmt -check .
 
       - name: Packer Validate
         run: |
-          cd ami
           packer validate .

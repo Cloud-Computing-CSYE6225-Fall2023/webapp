@@ -25,8 +25,8 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: "assignments_submission"
-          POSTGRES_PASSWORD: "mysecretpassword"
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
@@ -83,12 +83,15 @@ jobs:
       - name: Packer Init
         if: success()
         run: |
+          cd ami
           packer init .
 
       - name: Packer Format
         run: |
+          cd ami
           packer fmt -check .
 
       - name: Packer Validate
         run: |
+          cd ami
           packer validate .

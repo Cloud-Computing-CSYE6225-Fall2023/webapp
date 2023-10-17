@@ -65,41 +65,6 @@ variable "volume_type" {
   type = string
 }
 
-#variable "access_key_id" {
-#  type    = string
-#  default = "AKIAVXX7MQBJ23KLDKJL"
-#}
-#
-#variable "secret_access_key" {
-#  type    = string
-#  default = "sawbQMExHodhgofx096st3Gk0hzqt0vPObUxpnY0"
-#}
-#
-#variable "ssh_username" {
-#  type    = string
-#  default = "admin"
-#}
-#
-#variable "subnet_id" {
-#  type    = string
-#  default = "subnet-022e4a40b96c87648"
-#}
-#
-#variable "PCKR_DB_USER" {
-#  type    = string
-#  default = "postgres"
-#}
-#
-#variable "PCKR_DB_PASSWORD" {
-#  type    = string
-#  default = "mysecretpassword"
-#}
-#
-#variable "PCKR_DB_NAME" {
-#  type    = string
-#  default = "assignments_submission"
-#}
-
 source "amazon-ebs" "my-ami" {
   source_ami_filter {
     filters = {

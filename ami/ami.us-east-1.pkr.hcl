@@ -8,42 +8,42 @@ packer {
 }
 
 variable "aws_region" {
-  type = string
+  type    = string
   default = "us-east-1"
 }
 
 variable "source_ami" {
-  type = string
+  type    = string
   default = "ami-06db4d78cb1d3bbf9"
 }
 
 variable "ami_users" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "ssh_username" {
-  type = string
+  type    = string
   default = "admin"
 }
 
 variable "instance_type" {
-  type = string
+  type    = string
   default = "t2.micro"
 }
 
 variable "device_name" {
-  type = string
+  type    = string
   default = "/dev/xvda"
 }
 
 variable "volume_size" {
-  type = number
+  type    = number
   default = 8
 }
 
 variable "volume_type" {
-  type = string
+  type    = string
   default = "gp2"
 }
 

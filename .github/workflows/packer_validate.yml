@@ -13,6 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up Go 1.21.1
+        id: go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21.1
+
       - name: Checkout Code
         uses: actions/checkout@v2
 
@@ -42,3 +48,45 @@ jobs:
           zip -r webapp.zip ami migrations opt startup-scripts .env go.mod
           cd ami
           packer validate .
+
+      - name: Install Dependencies
+        run: |
+          go get -v ./...
+
+      - name: Build Go Application
+        run: |
+          go build -o webapp
+
+      - name: Zip Dependencies
+        run: |
+          ls
+          rm -rf webapp.zip
+          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod webapp
+
+      - name: Packer Build
+        if: success()
+        env:
+          PKR_VAR_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          PKR_VAR_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          PKR_VAR_subnet_id: ${{ secrets.AWS_DEFAULT_DEV_SUBNET_ID }}
+          PKR_VAR_DB_NAME: ${{ secrets.PCKR_DB_NAME }}
+          PKR_VAR_DB_USER: ${{ secrets.PCKR_DB_USER }}
+          PKR_VAR_DB_PASSWORD: ${{ secrets.PCKR_DB_PASSWORD }}
+          AWS_SSH_USER: ${{ secrets.AWS_SSH_USER }}
+          AWS_DEMO_ACCOUNT_ID: ${{ vars.AWS_DEMO_ACCOUNT_ID }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_SOURCE_AMI: ${{ vars.AWS_SOURCE_AMI }}
+          EC2_DEVICE_NAME: ${{ vars.EC2_DEVICE_NAME }}
+          EC2_INSTANCE_TYPE: ${{ vars.EC2_INSTANCE_TYPE }}
+          EC2_VOLUME_SIZE: ${{ vars.EC2_VOLUME_SIZE }}
+          EC2_VOLUME_TYPE: ${{ vars.EC2_VOLUME_TYPE }}
+        run: |
+          cd ami
+          packer build -var 'aws_region'=$AWS_REGION \
+          -var 'source_ami'=$AWS_SOURCE_AMI \
+          -var 'ssh_username'=$AWS_SSH_USER \
+          -var 'instance_type'=$EC2_INSTANCE_TYPE \
+          -var 'ami_users'=$AWS_DEMO_ACCOUNT_ID \
+          -var 'device_name'=$EC2_DEVICE_NAME \
+          -var 'volume_size'=$EC2_VOLUME_SIZE \
+          -var 'volume_type'=$EC2_VOLUME_TYPE ami.us-east-1.pkr.hcl

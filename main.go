@@ -116,9 +116,10 @@ func main() {
 	router.Handle("/v1/assignments/{id}", middleware.NewBasicAuth(assignmentHandler.Delete, accntSvc)).Methods("DELETE")
 
 	// Start the server
-	serverAddr := os.Getenv("SERV_ADDR")
+	//serverAddr := os.Getenv("SERV_ADDR")
 	port := os.Getenv("PORT")
-	server := fmt.Sprintf("%s:%s", serverAddr, port)
+	server := fmt.Sprintf(":%s", port)
+	//server := fmt.Sprintf("%s:%s", serverAddr, port)
 
 	_ = http.ListenAndServe(server, router)
 }

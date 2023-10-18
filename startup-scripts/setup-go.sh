@@ -19,12 +19,16 @@ rm /tmp/go.tar.gz
 
 
 # Setup Go Path
-#echo "Setting up Go environment variables..."
-#echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
-#echo 'export GOPATH=/root/github.com/shivasaicharanruthala' >> ~/.profile
-#source ~/.profile
-#
-#
+echo "Setting up Go environment variables..."
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
+echo 'export GOPATH=/home/admin/github.com/shivasaicharanruthala' >> ~/.profile
+source ~/.profile
+
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+echo 'export GOPATH=/home/admin/github.com/shivasaicharanruthala' >> ~/.bashrc
+source ~/.bashrc
+
+
 #echo "Check Go version"
-#go version
+go version
 

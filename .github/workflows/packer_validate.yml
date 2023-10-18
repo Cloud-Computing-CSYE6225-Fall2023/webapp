@@ -39,6 +39,6 @@ jobs:
 
       - name: Packer Validate
         run: |
-          cd ami
           zip -r webapp.zip ami migrations opt startup-scripts .env go.mod
+          cd ami
           packer validate .

@@ -20,6 +20,9 @@ rm /tmp/go.tar.gz
 
 # Setup Go Path
 echo "Setting up Go environment variables..."
+export PATH=$PATH:/usr/local/go/bin
+export GOPATH=/home/admin/github.com/shivasaicharanruthala
+
 echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
 echo 'export GOPATH=/home/admin/github.com/shivasaicharanruthala' >> ~/.profile
 source ~/.profile

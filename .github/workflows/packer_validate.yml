@@ -66,8 +66,8 @@ jobs:
       - name: Packer Build
         if: success()
         env:
-          PKR_VAR_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          PKR_VAR_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           PKR_VAR_subnet_id: ${{ secrets.AWS_DEFAULT_DEV_SUBNET_ID }}
           PKR_VAR_DB_NAME: ${{ secrets.PCKR_DB_NAME }}
           PKR_VAR_DB_USER: ${{ secrets.PCKR_DB_USER }}

@@ -62,6 +62,11 @@ variable "volume_type" {
   default = "gp2"
 }
 
+variable "owners" {
+  type    = string
+  default = "136693071363"
+}
+
 source "amazon-ebs" "my-ami" {
   source_ami_filter {
     filters = {
@@ -69,7 +74,7 @@ source "amazon-ebs" "my-ami" {
       architecture        = "x86_64"
       root-device-type    = "ebs"
     }
-    owners      = ["136693071363"]
+    owners      = ["${var.owners}"]
     most_recent = true
   }
 

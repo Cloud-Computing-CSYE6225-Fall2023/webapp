@@ -94,6 +94,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           PKR_VAR_subnet_id: ${{ secrets.AWS_DEFAULT_DEV_SUBNET_ID }}
           PKR_VAR_db_name: ${{ secrets.PCKR_DB_NAME }}
+          PKR_VAR_owners: ${{ vars.PKR_VAR_owners }}
           PKR_VAR_db_user: ${{ secrets.PCKR_DB_USER }}
           PKR_VAR_db_password: ${{ secrets.PCKR_DB_PASSWORD }}
           AWS_SSH_USER: ${{ secrets.AWS_SSH_USER }}

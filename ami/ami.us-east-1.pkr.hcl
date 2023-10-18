@@ -93,11 +93,10 @@ build {
       "CHECKPOINT_DISABLE=1"
     ]
     inline = [
-      "sudo apt-get update",
+      "sudo apt-get update -y",
       "sudo apt-get upgrade -y",
       "sudo apt-get clean",
-      "sudo apt install zip",
-      "sudo apt install unzip",
+      "sudo apt install zip unzip -y",
       "mkdir -p github.com/shivasaicharanruthala",
     ]
   }

@@ -67,7 +67,8 @@ jobs:
 
       - name: Zip Dependencies
         run: |
-          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod
+          ls
+          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod webapp
 
       - name: Packer Build
         if: success()

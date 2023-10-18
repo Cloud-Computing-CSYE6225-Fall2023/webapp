@@ -13,12 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Go 1.21.1
-        id: go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.21.1
-
       - name: Checkout Code
         uses: actions/checkout@v2
 
@@ -46,4 +40,5 @@ jobs:
       - name: Packer Validate
         run: |
           cd ami
+          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod
           packer validate .

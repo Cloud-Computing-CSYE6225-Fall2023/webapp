@@ -47,6 +47,10 @@ sudo apt-get install locales -y
 # Install PostgreSQL and its contrib package (includes additional utilities and extensions)
 sudo apt-get install postgresql postgresql-contrib -y
 
+sudo apt remove git -y
+sudo apt purge git -y
+sudo apt autoremove -y
+
 # Start and enable the PostgreSQL service
 sudo systemctl start postgresql
 sudo systemctl enable postgresql

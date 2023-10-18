@@ -24,17 +24,17 @@ variable "ami_users" {
 
 variable "db_user" {
   type    = string
-  default = "{{env `PKR_VAR_db_user`}}"
+  default = ""
 }
 
 variable "db_name" {
   type    = string
-  default = "{{env `PKR_VAR_db_name`}}"
+  default = ""
 }
 
 variable "db_password" {
   type    = string
-  default = "{{env `PKR_VAR_db_password`}}"
+  default = ""
 }
 
 variable "ssh_username" {
@@ -131,7 +131,7 @@ build {
       "export PATH=$PATH:/usr/local/go/bin",
       "export GOPATH=/home/admin/github.com/shivasaicharanruthala",
       "go version",
-      "sudo ./startup-scripts/setup-postgres.sh -u '${var.db_user}' -p '${var.db_password}' -d '${var.db_name}'",
+      "sudo ./startup-scripts/setup-postgres.sh -u ${var.db_user} -p ${var.db_password} -d ${var.db_name}",
       "go get -v ./...",
     ]
   }

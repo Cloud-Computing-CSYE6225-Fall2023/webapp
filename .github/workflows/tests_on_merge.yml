@@ -57,7 +57,20 @@ jobs:
           sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
           sudo apt-get update && sudo apt-get install packer
 
+      - name: Install Dependencies
+        run: |
+          go get -v ./...
+
+      - name: Build Go Application
+        run: |
+          go build -o webapp
+
+      - name: Zip Dependencies
+        run: |
+          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod
+
       - name: Packer Build
+        if: success()
         env:
           PKR_VAR_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           PKR_VAR_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

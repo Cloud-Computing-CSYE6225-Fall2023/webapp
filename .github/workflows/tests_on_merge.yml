@@ -47,19 +47,13 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Integration Tests
-        run: |
-          go test -v ./...
-
-      - name: Install Packer
-        run: |
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get update && sudo apt-get install packer
-
       - name: Install Dependencies
         run: |
           go get -v ./...
+
+      - name: Integration Tests
+        run: |
+          go test -v ./...
 
 #      - name: Build Go Application
 #        run: |
@@ -69,6 +63,12 @@ jobs:
 #        run: |
 #          ls
 #          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod webapp
+
+      - name: Install Packer
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install packer
 
       - name: Packer Build
         if: success()

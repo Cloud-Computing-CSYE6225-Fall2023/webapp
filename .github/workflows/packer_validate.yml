@@ -1,0 +1,57 @@
+name: Build Dependencies & Validate Packer
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+
+jobs:
+  packer-validation:
+    if: github.event.pull_request.head.repo.fork
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Go 1.21.1
+        id: go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21.1
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Packer
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install packer
+
+      - name: Packer Init
+        if: success()
+        run: |
+          cd ami
+          packer init .
+
+      - name: Packer Format
+        run: |
+          cd ami
+          packer fmt .
+
+      - name: Install Dependencies
+        run: |
+          go get -v ./...
+
+      - name: Build Go Application
+        run: |
+          go build -o webapp
+
+      - name: Zip Dependencies
+        run: |
+          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod
+
+      - name: Packer Validate
+        run: |
+          cd ami
+          packer validate .

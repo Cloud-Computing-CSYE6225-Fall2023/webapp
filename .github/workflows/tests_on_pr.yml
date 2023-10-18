@@ -57,7 +57,6 @@ jobs:
 
   packer-validation:
     if: github.event.pull_request.head.repo.fork
-    needs: setup-go
     runs-on: ubuntu-latest
 
     steps:
@@ -87,7 +86,7 @@ jobs:
           cd ami
           packer fmt .
 
-      - name: Install Dependencies &
+      - name: Install Dependencies
         run: |
           go get -v ./...
 

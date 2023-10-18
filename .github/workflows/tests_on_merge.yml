@@ -61,24 +61,24 @@ jobs:
         run: |
           go get -v ./...
 
-      - name: Build Go Application
-        run: |
-          go build -o webapp
-
-      - name: Zip Dependencies
-        run: |
-          ls
-          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod webapp
+#      - name: Build Go Application
+#        run: |
+#          go build -o webapp
+#
+#      - name: Zip Dependencies
+#        run: |
+#          ls
+#          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod webapp
 
       - name: Packer Build
         if: success()
         env:
-          PKR_VAR_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          PKR_VAR_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           PKR_VAR_subnet_id: ${{ secrets.AWS_DEFAULT_DEV_SUBNET_ID }}
-          PKR_VAR_DB_NAME: ${{ secrets.PCKR_DB_NAME }}
-          PKR_VAR_DB_USER: ${{ secrets.PCKR_DB_USER }}
-          PKR_VAR_DB_PASSWORD: ${{ secrets.PCKR_DB_PASSWORD }}
+          PKR_VAR_db_name: ${{ secrets.PCKR_DB_NAME }}
+          PKR_VAR_db_user: ${{ secrets.PCKR_DB_USER }}
+          PKR_VAR_db_password: ${{ secrets.PCKR_DB_PASSWORD }}
           AWS_SSH_USER: ${{ secrets.AWS_SSH_USER }}
           AWS_DEMO_ACCOUNT_ID: ${{ vars.AWS_DEMO_ACCOUNT_ID }}
           AWS_REGION: ${{ vars.AWS_REGION }}
@@ -89,11 +89,11 @@ jobs:
           EC2_VOLUME_TYPE: ${{ vars.EC2_VOLUME_TYPE }}
         run: |
           cd ami
-          packer build -var 'aws_region'=$AWS_REGION \
-          -var 'source_ami'=$AWS_SOURCE_AMI \
-          -var 'ssh_username'=$AWS_SSH_USER \
-          -var 'instance_type'=$EC2_INSTANCE_TYPE \
-          -var 'ami_users'=$AWS_DEMO_ACCOUNT_ID \
-          -var 'device_name'=$EC2_DEVICE_NAME \
-          -var 'volume_size'=$EC2_VOLUME_SIZE \
-          -var 'volume_type'=$EC2_VOLUME_TYPE ami.us-east-1.pkr.hcl
+          packer build -var "aws_region=$AWS_REGION" \
+          -var "source_ami=$AWS_SOURCE_AMI" \
+          -var "ssh_username=$AWS_SSH_USER" \
+          -var "instance_type=$EC2_INSTANCE_TYPE" \
+          -var "ami_users=$AWS_DEMO_ACCOUNT_ID" \
+          -var "device_name=$EC2_DEVICE_NAME" \
+          -var "volume_size=$EC2_VOLUME_SIZE" \
+          -var "volume_type=$EC2_VOLUME_TYPE" ami.us-east-1.pkr.hcl

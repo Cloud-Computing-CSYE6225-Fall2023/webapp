@@ -22,6 +22,21 @@ variable "ami_users" {
   default = ""
 }
 
+variable "db_user" {
+  type    = string
+  default = "{{env `PKR_VAR_db_user`}}"
+}
+
+variable "db_name" {
+  type    = string
+  default = "{{env `PKR_VAR_db_name`}}"
+}
+
+variable "db_password" {
+  type    = string
+  default = "{{env `PKR_VAR_db_password`}}"
+}
+
 variable "ssh_username" {
   type    = string
   default = "admin"
@@ -96,30 +111,28 @@ build {
       "sudo apt-get update -y",
       "sudo apt-get upgrade -y",
       "sudo apt-get clean",
-      "sudo apt install zip unzip -y",
+      "sudo apt install unzip -y",
       "mkdir -p github.com/shivasaicharanruthala",
     ]
   }
 
   provisioner "file" {
     destination = "/home/admin/github.com/shivasaicharanruthala"
-    source      = "../../webapp/webapp.zip"
+    source      = "../../webapp"
   }
 
   provisioner "shell" {
     inline = [
-      "cd github.com/shivasaicharanruthala",
-      "sudo unzip -q webapp.zip",
-      "cd webapp",
-      "ls",
+      "cd github.com/shivasaicharanruthala/webapp",
+      #      "sudo unzip -q webapp.zip",
       "sudo chmod +x ./startup-scripts/setup-go.sh",
       "sudo chmod +x ./startup-scripts/setup-postgres.sh",
       "sudo ./startup-scripts/setup-go.sh",
       "export PATH=$PATH:/usr/local/go/bin",
       "export GOPATH=/home/admin/github.com/shivasaicharanruthala",
       "go version",
-      "sudo ./startup-scripts/setup-postgres.sh -u $PKR_VAR_DB_USER -p $PKR_VAR_DB_PASSWORD -d $PKR_VAR_DB_NAME",
-      "go get -v ./..."
+      "sudo ./startup-scripts/setup-postgres.sh -u '${var.db_user}' -p '${var.db_password}' -d '${var.db_name}'",
+      "go get -v ./...",
     ]
   }
 }

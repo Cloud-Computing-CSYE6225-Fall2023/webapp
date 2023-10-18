@@ -55,6 +55,17 @@ jobs:
         run: |
           go test -v ./...
 
+      - name: Create environment file
+        run: |
+          touch .env
+          echo "export SERV_ADDR=$SERV_ADDR" >> .env
+          echo "export PORT=$PORT" >> .env
+          echo "export POSTGRESQL_CONNECTION_STRING=$POSTGRESQL_CONNECTION_STRING" >> .env
+          echo "export DB_NAME=$DB_NAME" >> .env
+          echo "export DRIVER_NAME=$DRIVER_NAME" >> .env
+          echo "export USER_DATA_FILE_PATH=$USER_DATA_FILE_PATH" >> .env
+          echo "export MIGRATION_FILE_PATH=$MIGRATION_FILE_PATH" >> .env
+
 #      - name: Build Go Application
 #        run: |
 #          go build -o webapp

@@ -2,30 +2,25 @@ package database
 
 import (
 	"database/sql"
+	"os"
 )
 
 type dbConn struct {
-	conn *sql.DB
-	error
 }
 
-//func New() SQLDatabase {
-//	return &dbConn{}
-//}
-//
-//func (db *dbConn) Open() {
-//	connectionStr := os.Getenv("POSTGRESQL_CONNECTION_STRING")
-//	driverName := os.Getenv("DRIVER_NAME")
-//
-//	db, err := sql.Open(driverName, connectionStr)
-//	defer func(db *sql.DB) {
-//		er := db.Close()
-//		if er != nil {
-//			panic(err.Error())
-//		}
-//	}(db)
-//	if err != nil {
-//		panic(err.Error())
-//	}
-//
-//}
+func New() SQLDatabase {
+	return &dbConn{}
+}
+
+func (dbo *dbConn) Open() (*sql.DB, error) {
+	connectionStr := os.Getenv("POSTGRESQL_CONNECTION_STRING")
+	driverName := os.Getenv("DRIVER_NAME")
+
+	db, err := sql.Open(driverName, connectionStr)
+	defer db.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}

@@ -132,7 +132,7 @@ build {
       "sudo unzip -q webapp.zip",
       "sudo chmod +x ./startup-scripts/setup-go.sh ./startup-scripts/setup-postgres.sh ./startup-scripts/setup-gopath.sh",
       "sudo ./startup-scripts/setup-go.sh",
-      "sudo source ./startup-scripts/setup-gopath.sh",
+      ". ./startup-scripts/setup-gopath.sh",
       "sudo ./startup-scripts/setup-postgres.sh -u ${var.db_user} -p ${var.db_password} -d ${var.db_name}",
     ]
   }

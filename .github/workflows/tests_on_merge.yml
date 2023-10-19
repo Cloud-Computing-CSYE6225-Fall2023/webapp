@@ -66,14 +66,13 @@ jobs:
           echo "export USER_DATA_FILE_PATH=$USER_DATA_FILE_PATH" >> .env
           echo "export MIGRATION_FILE_PATH=$MIGRATION_FILE_PATH" >> .env
 
-#      - name: Build Go Application
-#        run: |
-#          go build -o webapp
-#
-#      - name: Zip Dependencies
-#        run: |
-#          ls
-#          zip -r webapp.zip ami migrations opt startup-scripts .env go.mod webapp
+      - name: Build Go Application
+        run: |
+          GOARCH=amd64 GOOS=linux go build -o webapp
+
+      - name: Zip Dependencies
+        run: |
+          zip -r webapp.zip migrations opt startup-scripts .env webapp
 
       - name: Install Packer
         run: |

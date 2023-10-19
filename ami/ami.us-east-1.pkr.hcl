@@ -117,27 +117,23 @@ build {
       "sudo apt-get upgrade -y",
       "sudo apt-get clean",
       "sudo apt install unzip -y",
-      "mkdir -p github.com/shivasaicharanruthala",
+      "mkdir -p github.com/shivasaicharanruthala/webapp",
     ]
   }
 
   provisioner "file" {
-    destination = "/home/admin/github.com/shivasaicharanruthala"
-    source      = "../../webapp"
+    destination = "/home/admin/github.com/shivasaicharanruthala/webapp/"
+    source      = "../../webapp/webapp.zip"
   }
 
   provisioner "shell" {
     inline = [
       "cd github.com/shivasaicharanruthala/webapp",
-      #      "sudo unzip -q webapp.zip",
-      "sudo chmod +x ./startup-scripts/setup-go.sh",
-      "sudo chmod +x ./startup-scripts/setup-postgres.sh",
+      "sudo unzip -q webapp.zip",
+      "sudo chmod +x ./startup-scripts/setup-go.sh ./startup-scripts/setup-postgres.sh ./startup-scripts/setup-gopath.sh",
       "sudo ./startup-scripts/setup-go.sh",
-      "export PATH=$PATH:/usr/local/go/bin",
-      "export GOPATH=/home/admin/github.com/shivasaicharanruthala",
-      "go version",
+      "sudo source ./startup-scripts/setup-gopath.sh",
       "sudo ./startup-scripts/setup-postgres.sh -u ${var.db_user} -p ${var.db_password} -d ${var.db_name}",
-      "go get -v ./...",
     ]
   }
 }

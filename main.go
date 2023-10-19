@@ -28,28 +28,25 @@ func init() {
 }
 
 func main() {
-	connectionStr := os.Getenv("POSTGRESQL_CONNECTION_STRING")
 	driverName := os.Getenv("DRIVER_NAME")
-	migrationFilePath := os.Getenv("MIGRATION_FILE_PATH")
+	connectionStr := os.Getenv("POSTGRESQL_CONNECTION_STRING")
 	databaseName := os.Getenv("DB_NAME")
+	migrationFilePath := os.Getenv("MIGRATION_FILE_PATH")
 
 	db, err := sql.Open(driverName, connectionStr)
 	defer func(db *sql.DB) {
 		er := db.Close()
 		if er != nil {
 			fmt.Printf("ERROR: Closing Connection to database failed with error %v", er.Error())
-			//panic(errors.NewCustomError(er))
 		}
 	}(db)
 	if err != nil {
 		fmt.Printf("ERROR: Connection opening to Database failed with error %v", err.Error())
-		//panic(errors.NewCustomError(err))
 	}
 
 	err = db.Ping()
 	if err != nil {
 		fmt.Printf("ERROR: Ping to Database failed with error %v", err.Error())
-		//panic(errors.NewCustomError(err))
 	}
 
 	// Run Migrations
@@ -57,13 +54,11 @@ func main() {
 		driver, err := postgres.WithInstance(db, &postgres.Config{})
 		if err != nil {
 			fmt.Printf("ERROR: Connecting to database for migration failed with error %v", err.Error())
-			//panic(errors.NewCustomError(err))
 		}
 
 		m, err := migrate.NewWithDatabaseInstance(migrationFilePath, databaseName, driver)
 		if err != nil {
 			fmt.Printf("ERROR: Connecting to database for migration failed with error %v", err.Error())
-			//panic(errors.NewCustomError(err))
 		}
 
 		if m != nil && err == nil {
@@ -71,7 +66,6 @@ func main() {
 			if err != nil {
 				if err.Error() != "no change" {
 					fmt.Printf("ERROR: Migration to schemas failed with error %v", err.Error())
-					//panic(errors.NewCustomError(err))
 				}
 			}
 		}
@@ -116,10 +110,8 @@ func main() {
 	router.Handle("/v1/assignments/{id}", middleware.NewBasicAuth(assignmentHandler.Delete, accntSvc)).Methods("DELETE")
 
 	// Start the server
-	//serverAddr := os.Getenv("SERV_ADDR")
 	port := os.Getenv("PORT")
 	server := fmt.Sprintf(":%s", port)
-	//server := fmt.Sprintf("%s:%s", serverAddr, port)
 
 	_ = http.ListenAndServe(server, router)
 }

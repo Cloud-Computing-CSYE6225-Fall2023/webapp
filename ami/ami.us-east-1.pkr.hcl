@@ -7,7 +7,7 @@ packer {
   }
 }
 
-variable "aws_region"   {
+variable "aws_region" {
   type    = string
   default = "us-east-1"
 }
@@ -80,7 +80,7 @@ source "amazon-ebs" "my-ami" {
 
   ami_name        = "webapp_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = "AMI for webapp"
-  region          = "${var.aws_region}"
+  region          = "${var.aws_regio}"
 
   ami_regions = [
     "${var.aws_region}",

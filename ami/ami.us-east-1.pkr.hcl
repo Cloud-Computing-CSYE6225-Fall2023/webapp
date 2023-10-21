@@ -80,7 +80,7 @@ source "amazon-ebs" "my-ami" {
 
   ami_name        = "webapp_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = "AMI for webapp"
-  region          = "${var.aws_regio}"
+  region          = "${var.aws_region}"
 
   ami_regions = [
     "${var.aws_region}",

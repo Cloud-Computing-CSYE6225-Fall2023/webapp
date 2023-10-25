@@ -117,23 +117,28 @@ build {
       "sudo apt-get upgrade -y",
       "sudo apt-get clean",
       "sudo apt install unzip -y",
-      "mkdir -p github.com/shivasaicharanruthala/webapp",
+#      "sudo mkdir -p /home/webapp"
     ]
   }
 
   provisioner "file" {
-    destination = "/home/admin/github.com/shivasaicharanruthala/webapp/"
+    destination = "/home/admin/"
     source      = "../../webapp/webapp.zip"
   }
 
   provisioner "shell" {
     inline = [
-      "cd github.com/shivasaicharanruthala/webapp",
+      "sudo mkdir -p ../webapp",
+      "sudo cp /home/admin/webapp.zip ../webapp",
+      "cd ../webapp",
       "sudo unzip -q webapp.zip",
-      "sudo chmod +x ./startup-scripts/setup-go.sh ./startup-scripts/setup-postgres.sh ./startup-scripts/setup-gopath.sh",
-      "sudo ./startup-scripts/setup-go.sh",
-      ". ./startup-scripts/setup-gopath.sh",
+      "sudo chmod +x ./startup-scripts/setup-go.sh ./startup-scripts/setup-postgres.sh ./startup-scripts/setup-gopath.sh ./startup-scripts/service-startup.sh",
+      #      "sudo ./startup-scripts/setup-go.sh",
+      #      ". ./startup-scripts/setup-gopath.sh",
       "sudo ./startup-scripts/setup-postgres.sh -u ${var.db_user} -p ${var.db_password} -d ${var.db_name}",
+      "sudo ./startup-scripts/service-startup.sh",
+      "sudo chown -R ec2-user:ec2-user /home/webapp",
+      "sudo chown -R ec2-user:ec2-user /etc/systemd/system/webapp.service"
     ]
   }
 }

@@ -72,7 +72,7 @@ jobs:
 
       - name: Zip Dependencies
         run: |
-          zip -r webapp.zip migrations opt startup-scripts .env webapp
+          zip -r webapp.zip migrations opt startup-scripts webapp
 
       - name: Install Packer
         run: |
@@ -96,21 +96,14 @@ jobs:
           PKR_VAR_owners: ${{ vars.PKR_VAR_owners }}
           PKR_VAR_db_user: ${{ secrets.PCKR_DB_USER }}
           PKR_VAR_db_password: ${{ secrets.PCKR_DB_PASSWORD }}
-          AWS_SSH_USER: ${{ secrets.AWS_SSH_USER }}
-          AWS_DEMO_ACCOUNT_ID: ${{ vars.AWS_DEMO_ACCOUNT_ID }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          AWS_SOURCE_AMI: ${{ vars.AWS_SOURCE_AMI }}
-          EC2_DEVICE_NAME: ${{ vars.EC2_DEVICE_NAME }}
-          EC2_INSTANCE_TYPE: ${{ vars.EC2_INSTANCE_TYPE }}
-          EC2_VOLUME_SIZE: ${{ vars.EC2_VOLUME_SIZE }}
-          EC2_VOLUME_TYPE: ${{ vars.EC2_VOLUME_TYPE }}
+          PKR_VAR_ssh_username: ${{ secrets.AWS_SSH_USER }}
+          PKR_VAR_ami_users: ${{ vars.AWS_DEMO_ACCOUNT_ID }}
+          PKR_VAR_aws_region: ${{ vars.AWS_REGION }}
+          PKR_VAR_source_ami: ${{ vars.AWS_SOURCE_AMI }}
+          PKR_VAR_device_name: ${{ vars.EC2_DEVICE_NAME }}
+          PKR_VAR_instance_type: ${{ vars.EC2_INSTANCE_TYPE }}
+          PKR_VAR_volume_size: ${{ vars.EC2_VOLUME_SIZE }}
+          PKR_VAR_volume_type: ${{ vars.EC2_VOLUME_TYPE }}
         run: |
           cd ami
-          packer build -var "aws_region=$AWS_REGION" \
-          -var "source_ami=$AWS_SOURCE_AMI" \
-          -var "ssh_username=$AWS_SSH_USER" \
-          -var "instance_type=$EC2_INSTANCE_TYPE" \
-          -var "ami_users=$AWS_DEMO_ACCOUNT_ID" \
-          -var "device_name=$EC2_DEVICE_NAME" \
-          -var "volume_size=$EC2_VOLUME_SIZE" \
-          -var "volume_type=$EC2_VOLUME_TYPE" ami.us-east-1.pkr.hcl
+          packer build ami.us-east-1.pkr.hcl

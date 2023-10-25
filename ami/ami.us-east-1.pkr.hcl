@@ -132,12 +132,10 @@ build {
       "cd ../webapp",
       "sudo unzip -q webapp.zip",
       "sudo chmod +x ./startup-scripts/setup-go.sh ./startup-scripts/setup-postgres.sh ./startup-scripts/setup-gopath.sh ./startup-scripts/service-startup.sh",
-      #      "sudo ./startup-scripts/setup-go.sh",
-      #      ". ./startup-scripts/setup-gopath.sh",
+      "sudo ./startup-scripts/setup-go.sh",
+      ". ./startup-scripts/setup-gopath.sh",
       #      "sudo ./startup-scripts/setup-postgres.sh -u ${var.db_user} -p ${var.db_password} -d ${var.db_name}",
       "sudo ./startup-scripts/service-startup.sh",
-      "sudo chown -R ec2-user:ec2-user /home/webapp",
-      "sudo chown -R ec2-user:ec2-user /etc/systemd/system/webapp.service"
     ]
   }
 }

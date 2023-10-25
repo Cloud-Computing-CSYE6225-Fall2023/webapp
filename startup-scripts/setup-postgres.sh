@@ -56,9 +56,9 @@ sudo systemctl start postgresql
 sudo systemctl enable postgresql
 
 # Create a new PostgreSQL user and database (optional)
- sudo -u postgres psql -c "ALTER USER $user WITH PASSWORD '$password';"
- sudo -u postgres psql -c "CREATE DATABASE $database;"
- sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $database TO $user;"
+sudo -u postgres psql -c "ALTER USER $user WITH PASSWORD '$password';"
+sudo -u postgres psql -c "CREATE DATABASE $database;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $database TO $user;"
 
 echo "PostgreSQL installation completed."
 echo "Check PostgreSQL Version"

@@ -6,11 +6,10 @@ sudo useradd -s /bin/false -g ec2-user ec2-user
 
 sudo cp ./startup-scripts/webapp.service /etc/systemd/system
 
-sudo chown -R ec2-user:ec2-user /home/webapp
-sudo chown -R ec2-user:ec2-user /etc/systemd/system/webapp.service
-sudo u+x /etc/systemd/system/webapp.service
+sudo chown -R ec2-user:ec2-user /home/ec2-user/webapp
+sudo chmod 744 /home/ec2-user/webapp
 
 sudo systemctl daemon-reload
-sudo -u ec2-user systemctl enable webapp
-sudo -u ec2-user systemctl start webapp
-sudo -u ec2-user systemctl restart webapp
+sudo systemctl enable webapp
+sudo systemctl start webapp
+sudo systemctl restart webapp

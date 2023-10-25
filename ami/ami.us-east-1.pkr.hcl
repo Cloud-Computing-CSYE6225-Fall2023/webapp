@@ -127,9 +127,9 @@ build {
 
   provisioner "shell" {
     inline = [
-      "sudo mkdir -p ../webapp",
-      "sudo cp /home/admin/webapp.zip ../webapp",
-      "cd ../webapp",
+      "sudo mkdir -p ../ec2-user/webapp",
+      "sudo cp /home/admin/webapp.zip ../ec2-user/webapp",
+      "cd ../ec2-user/webapp",
       "sudo unzip -q webapp.zip",
       "sudo chmod +x ./startup-scripts/setup-go.sh ./startup-scripts/setup-postgres.sh ./startup-scripts/setup-gopath.sh ./startup-scripts/service-startup.sh",
       "sudo ./startup-scripts/setup-go.sh",

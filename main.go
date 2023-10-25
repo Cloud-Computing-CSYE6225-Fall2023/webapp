@@ -22,18 +22,28 @@ import (
 )
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		fmt.Println("Error loading .env file")
+	for _, envFilePath := range EnvFilePaths {
+		err := godotenv.Load(envFilePath)
+		if err != nil {
+			fmt.Printf("Error loading %v file\n", envFilePath)
+		} else {
+			break
+		}
 	}
 }
 
 func main() {
-	driverName := os.Getenv("DRIVER_NAME")
-	connectionStr := os.Getenv("POSTGRESQL_CONNECTION_STRING")
-	databaseName := os.Getenv("DB_NAME")
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASS")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	dbDriver := os.Getenv("DRIVER_NAME")
 	migrationFilePath := os.Getenv("MIGRATION_FILE_PATH")
 
-	db, err := sql.Open(driverName, connectionStr)
+	connectionStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPass, dbHost, dbPort, dbName)
+
+	db, err := sql.Open(dbDriver, connectionStr)
 	defer func(db *sql.DB) {
 		er := db.Close()
 		if er != nil {
@@ -56,7 +66,7 @@ func main() {
 			fmt.Printf("ERROR: Connecting to database for migration failed with error %v", err.Error())
 		}
 
-		m, err := migrate.NewWithDatabaseInstance(migrationFilePath, databaseName, driver)
+		m, err := migrate.NewWithDatabaseInstance(migrationFilePath, dbName, driver)
 		if err != nil {
 			fmt.Printf("ERROR: Connecting to database for migration failed with error %v", err.Error())
 		}
@@ -117,8 +127,14 @@ func main() {
 }
 
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	connectionStr := os.Getenv("POSTGRESQL_CONNECTION_STRING")
-	driverName := os.Getenv("DRIVER_NAME")
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASS")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	dbDriver := os.Getenv("DRIVER_NAME")
+
+	connectionStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPass, dbHost, dbPort, dbName)
 
 	if len(r.URL.Query()) > 0 {
 		SetNoCacheResponseHeaders(w)
@@ -140,7 +156,7 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := sql.Open(driverName, connectionStr)
+	db, err := sql.Open(dbDriver, connectionStr)
 	defer func(db *sql.DB) {
 		er := db.Close()
 		if er != nil {

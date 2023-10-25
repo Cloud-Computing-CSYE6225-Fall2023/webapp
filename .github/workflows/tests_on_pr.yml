@@ -11,9 +11,11 @@ jobs:
     name: setup-go
     runs-on: ubuntu-latest
     env:
-      SERV_ADDR: ${{ vars.SERV_ADDR }}
       PORT: ${{ vars.PORT }}
-      POSTGRESQL_CONNECTION_STRING: ${{ vars.POSTGRESQL_CONNECTION_STRING }}
+      DB_USER: ${{ vars.DB_USER }}
+      DB_PASS: ${{ vars.DB_PASS }}
+      DB_HOST: ${{ vars.DB_HOST }}
+      DB_PORT: ${{ vars.DB_PORT }}
       DB_NAME: ${{ vars.DB_NAME }}
       DRIVER_NAME: ${{ vars.DRIVER_NAME }}
       USER_DATA_FILE_PATH: ${{ vars.USER_DATA_FILE_PATH }}

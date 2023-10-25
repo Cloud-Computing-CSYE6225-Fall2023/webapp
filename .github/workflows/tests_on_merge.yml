@@ -13,9 +13,11 @@ jobs:
     name: setup-go
     runs-on: ubuntu-latest
     env:
-      SERV_ADDR: ${{ vars.SERV_ADDR }}
       PORT: ${{ vars.PORT }}
-      POSTGRESQL_CONNECTION_STRING: ${{ vars.POSTGRESQL_CONNECTION_STRING }}
+      DB_USER: ${{ vars.DB_USER }}
+      DB_PASS: ${{ vars.DB_PASS }}
+      DB_HOST: ${{ vars.DB_HOST }}
+      DB_PORT: ${{ vars.DB_PORT }}
       DB_NAME: ${{ vars.DB_NAME }}
       DRIVER_NAME: ${{ vars.DRIVER_NAME }}
       USER_DATA_FILE_PATH: ${{ vars.USER_DATA_FILE_PATH }}
@@ -55,16 +57,18 @@ jobs:
         run: |
           go test -v ./...
 
-      - name: Create environment file
-        run: |
-          touch .env
-          echo "export SERV_ADDR=$SERV_ADDR" >> .env
-          echo "export PORT=$PORT" >> .env
-          echo "export POSTGRESQL_CONNECTION_STRING=$POSTGRESQL_CONNECTION_STRING" >> .env
-          echo "export DB_NAME=$DB_NAME" >> .env
-          echo "export DRIVER_NAME=$DRIVER_NAME" >> .env
-          echo "export USER_DATA_FILE_PATH=$USER_DATA_FILE_PATH" >> .env
-          echo "export MIGRATION_FILE_PATH=$MIGRATION_FILE_PATH" >> .env
+#      - name: Create environment file
+#        run: |
+#          touch .env
+#          echo "export PORT=$PORT" >> .env
+#          echo "export DB_USER=$DB_USER" >> .env
+#          echo "export DB_PASS=$DB_PASS" >> .env
+#          echo "export DB_HOST=$DB_HOST" >> .env
+#          echo "export DB_PORT=$DB_PORT" >> .env
+#          echo "export DB_NAME=$DB_NAME" >> .env
+#          echo "export DRIVER_NAME=$DRIVER_NAME" >> .env
+#          echo "export USER_DATA_FILE_PATH=$USER_DATA_FILE_PATH" >> .env
+#          echo "export MIGRATION_FILE_PATH=$MIGRATION_FILE_PATH" >> .env
 
       - name: Build Go Application
         run: |

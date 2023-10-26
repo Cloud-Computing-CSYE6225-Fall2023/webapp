@@ -37,12 +37,12 @@ jobs:
         run: |
           brew services start postgresql
 
-          sudo -u postgres psql -c "ALTER USER $user WITH PASSWORD '$password';"
-          sudo -u postgres psql -c "ALTER ROLE $DB_USER SET client_encoding TO 'utf8';"
-          sudo -u postgres psql -c "ALTER ROLE $DB_USER SET default_transaction_isolation TO 'read committed';"
-          sudo -u postgres psql -c "ALTER ROLE $DB_USER SET timezone TO 'UTC';"
-          sudo -u postgres psql -c "CREATE DATABASE $database;"
-          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_DB TO $DB_USER;"
+          psql -c "ALTER USER $user WITH PASSWORD '$password';"
+          psql -c "ALTER ROLE $DB_USER SET client_encoding TO 'utf8';"
+          psql -c "ALTER ROLE $DB_USER SET default_transaction_isolation TO 'read committed';"
+          psql -c "ALTER ROLE $DB_USER SET timezone TO 'UTC';"
+          psql -c "CREATE DATABASE $database;"
+          psql -c "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_DB TO $DB_USER;"
 
       - name: Set up Go 1.21.1
         id: go

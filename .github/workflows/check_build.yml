@@ -1,0 +1,124 @@
+name: Packer Build
+
+on:
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  setup-go:
+    if: github.event.pull_request.head.repo.fork
+    name: setup-go
+    runs-on: macos-latest
+    env:
+      PORT: ${{ vars.PORT }}
+      DB_USER: ${{ vars.DB_USER }}
+      DB_PASS: ${{ vars.DB_PASS }}
+      DB_HOST: ${{ vars.DB_HOST }}
+      DB_PORT: ${{ vars.DB_PORT }}
+      DB_NAME: ${{ vars.DB_NAME }}
+      DRIVER_NAME: ${{ vars.DRIVER_NAME }}
+      USER_DATA_FILE_PATH: ${{ vars.USER_DATA_FILE_PATH }}
+      MIGRATION_FILE_PATH: ${{ vars.MIGRATION_FILE_PATH }}
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+          POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Set up Go 1.21.1
+        id: go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21.1
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          go get -v ./...
+
+      - name: Integration Tests
+        run: |
+          go test -v ./...
+
+      #      - name: Create environment file
+      #        run: |
+      #          touch .env
+      #          echo "export PORT=$PORT" >> .env
+      #          echo "export DB_USER=$DB_USER" >> .env
+      #          echo "export DB_PASS=$DB_PASS" >> .env
+      #          echo "export DB_HOST=$DB_HOST" >> .env
+      #          echo "export DB_PORT=$DB_PORT" >> .env
+      #          echo "export DB_NAME=$DB_NAME" >> .env
+      #          echo "export DRIVER_NAME=$DRIVER_NAME" >> .env
+      #          echo "export USER_DATA_FILE_PATH=$USER_DATA_FILE_PATH" >> .env
+      #          echo "export MIGRATION_FILE_PATH=$MIGRATION_FILE_PATH" >> .env
+
+      - name: Build Go Application
+        run: |
+          GOARCH=amd64 GOOS=linux go build -o webapp
+
+      - name: Install HomeBrew & Zip
+        run: |
+          xcode-select --install
+          sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew --version
+          
+          brew install zip
+
+      - name: Zip Dependencies
+        run: |
+          zip -r webapp.zip migrations opt startup-scripts webapp
+
+      - name: Install Packer
+        run: |
+#          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+#          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+#          sudo apt-get update && sudo apt-get install packer
+          brew tap hashicorp/tap
+          brew install hashicorp/tap/packer
+          brew upgrade hashicorp/tap/packer
+          packer --version
+
+      - name: Packer Init
+        if: success()
+        run: |
+          cd ami
+          packer init .
+
+      - name: Packer Build
+        if: success()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          PKR_VAR_subnet_id: ${{ secrets.AWS_DEFAULT_DEV_SUBNET_ID }}
+          PKR_VAR_db_name: ${{ secrets.PCKR_DB_NAME }}
+          PKR_VAR_owners: ${{ vars.PKR_VAR_owners }}
+          PKR_VAR_db_user: ${{ secrets.PCKR_DB_USER }}
+          PKR_VAR_db_password: ${{ secrets.PCKR_DB_PASSWORD }}
+          PKR_VAR_ssh_username: ${{ secrets.AWS_SSH_USER }}
+          PKR_VAR_ami_users: ${{ vars.AWS_DEMO_ACCOUNT_ID }}
+          PKR_VAR_aws_region: ${{ vars.AWS_REGION }}
+          PKR_VAR_source_ami: ${{ vars.AWS_SOURCE_AMI }}
+          PKR_VAR_device_name: ${{ vars.EC2_DEVICE_NAME }}
+          PKR_VAR_instance_type: ${{ vars.EC2_INSTANCE_TYPE }}
+          PKR_VAR_volume_size: ${{ vars.EC2_VOLUME_SIZE }}
+          PKR_VAR_volume_type: ${{ vars.EC2_VOLUME_TYPE }}
+        run: |
+          cd ami
+          packer build ami.us-east-1.pkr.hcl

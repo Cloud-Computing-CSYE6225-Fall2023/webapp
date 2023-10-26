@@ -17,6 +17,8 @@ jobs:
       DB_HOST: ${{ vars.DB_HOST }}
       DB_PORT: ${{ vars.DB_PORT }}
       DB_NAME: ${{ vars.DB_NAME }}
+      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+      POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
       DRIVER_NAME: ${{ vars.DRIVER_NAME }}
       USER_DATA_FILE_PATH: ${{ vars.USER_DATA_FILE_PATH }}
       MIGRATION_FILE_PATH: ${{ vars.MIGRATION_FILE_PATH }}
@@ -28,18 +30,14 @@ jobs:
           sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           brew --version
           brew install zip
+
       - name: Install Postgres
         run: brew install postgresql
 
       - name: Configure Postgres
-        env:
-          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
-          POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
         run: |
-#          Start PostgreSQL
           brew services start postgresql
-      
-          # Create the custom database and user
+
           sudo -u postgres psql -c "ALTER USER $user WITH PASSWORD '$password';"
           sudo -u postgres psql -c "ALTER ROLE $DB_USER SET client_encoding TO 'utf8';"
           sudo -u postgres psql -c "ALTER ROLE $DB_USER SET default_transaction_isolation TO 'read committed';"

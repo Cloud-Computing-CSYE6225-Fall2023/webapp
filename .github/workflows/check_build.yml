@@ -21,23 +21,32 @@ jobs:
       USER_DATA_FILE_PATH: ${{ vars.USER_DATA_FILE_PATH }}
       MIGRATION_FILE_PATH: ${{ vars.MIGRATION_FILE_PATH }}
 
-    services:
-      postgres:
-        image: postgres
+    steps:
+      - name: Install HomeBrew & Zip
+        run: |
+          xcode-select --install
+          sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew --version
+          brew install zip
+      - name: Install Postgres
+        run: brew install postgresql
+
+      - name: Configure Postgres
         env:
           POSTGRES_DB: ${{ vars.POSTGRES_DB }}
           POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        run: |
+#          Start PostgreSQL
+          brew services start postgresql
+      
+          # Create the custom database and user
+          sudo -u postgres psql -c "ALTER USER $user WITH PASSWORD '$password';"
+          sudo -u postgres psql -c "ALTER ROLE $DB_USER SET client_encoding TO 'utf8';"
+          sudo -u postgres psql -c "ALTER ROLE $DB_USER SET default_transaction_isolation TO 'read committed';"
+          sudo -u postgres psql -c "ALTER ROLE $DB_USER SET timezone TO 'UTC';"
+          sudo -u postgres psql -c "CREATE DATABASE $database;"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_DB TO $DB_USER;"
 
-    steps:
       - name: Set up Go 1.21.1
         id: go
         uses: actions/setup-go@v4
@@ -58,13 +67,6 @@ jobs:
       - name: Build Go Application
         run: |
           GOARCH=amd64 GOOS=linux go build -o webapp
-
-      - name: Install HomeBrew & Zip
-        run: |
-          xcode-select --install
-          sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew --version
-          brew install zip
 
       - name: Zip Dependencies
         run: |

@@ -1,10 +1,9 @@
-name: Packer Build
+name: Check Merge
 
 on:
   pull_request:
     branches:
       - main
-
 
 jobs:
   setup-go:

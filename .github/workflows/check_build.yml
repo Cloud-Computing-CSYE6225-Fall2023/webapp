@@ -26,7 +26,6 @@ jobs:
     steps:
       - name: Install HomeBrew & Zip
         run: |
-          xcode-select --install
           sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           brew --version
           brew install zip

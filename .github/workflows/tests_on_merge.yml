@@ -72,6 +72,13 @@ jobs:
 
       - name: Build Go Application
         run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt install libc6 -y
+          sudo apt-get clean
+        
+          go version
+          
           GOARCH=amd64 GOOS=linux go build -o webapp
 
       - name: Zip Dependencies

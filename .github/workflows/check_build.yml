@@ -78,13 +78,13 @@ jobs:
           ~/glibc/glibc-2.34/configure --prefix=$HOME/glibc/glibc-2.34-install
           make -j
           make install
+          
 
       - name: Build Go Application
         run: |
           sudo apt-get update
           sudo apt-get upgrade -y
           sudo apt install build-essential -y
-#          sudo apt install libc6 -y
           sudo apt-get clean
           
           go version

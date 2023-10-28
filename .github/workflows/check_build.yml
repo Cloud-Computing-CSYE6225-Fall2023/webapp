@@ -67,17 +67,6 @@ jobs:
       #          echo "export DRIVER_NAME=$DRIVER_NAME" >> .env
       #          echo "export USER_DATA_FILE_PATH=$USER_DATA_FILE_PATH" >> .env
       #          echo "export MIGRATION_FILE_PATH=$MIGRATION_FILE_PATH" >> .env
-      - name: Install proper Glibc package
-        run: |
-          wget http://ftp.gnu.org/gnu/libc/glibc-2.34.tar.gz
-          tar -xvf glibc-2.34.tar.gz
-          cd glibc-2.34
-          mkdir build 
-          mkdir glibc-2.34-install
-          cd build
-          ~/glibc/glibc-2.34/configure --prefix=$HOME/glibc/glibc-2.34-install
-          make -j
-          make install
           
 
       - name: Build Go Application
@@ -89,7 +78,7 @@ jobs:
           
           go version
           
-          GOARCH=amd64 GOOS=linux go build -o webapp
+          GOARCH=amd64 GOOS=linux go build -tags musl -o webapp
 
       - name: Zip Dependencies
         run: |

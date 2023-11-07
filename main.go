@@ -3,6 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/shivasaicharanruthala/webapp/log"
+	"github.com/shivasaicharanruthala/webapp/mailer"
+	"github.com/shivasaicharanruthala/webapp/types"
 	"io"
 	"net/http"
 	"os"
@@ -19,6 +22,7 @@ import (
 	assignmentSvc "github.com/shivasaicharanruthala/webapp/service/assignment"
 	"github.com/shivasaicharanruthala/webapp/store/account"
 	"github.com/shivasaicharanruthala/webapp/store/assignment"
+	"gopkg.in/alexcesaro/statsd.v2"
 )
 
 func init() {
@@ -39,10 +43,32 @@ func main() {
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 	dbDriver := os.Getenv("DRIVER_NAME")
+	//metricServerPort := os.Getenv("METRIC_SERVER_PORT")
+	logFilePath := os.Getenv("LOG_FILE_PATH")
 	migrationFilePath := os.Getenv("MIGRATION_FILE_PATH")
 
 	connectionStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPass, dbHost, dbPort, dbName)
 
+	// Initialize MailerSend Client
+	mailerClient := mailer.New()
+
+	// Initialize Logger
+	logger, err := log.NewCustomLogger(logFilePath)
+	if err != nil {
+		fmt.Printf("ERROR: Initiating logger with error %v", err.Error())
+	}
+
+	// Initialize Metric Server
+	metricClient, err := statsd.New()
+	if err != nil {
+		fmt.Printf("ERROR: Initiating stasd metricClient with error %v", err.Error())
+	}
+	defer metricClient.Close()
+
+	// Initialize Context
+	ctx := types.NewContext(logger, metricClient, mailerClient)
+
+	// Initialize DB connection
 	db, err := sql.Open(dbDriver, connectionStr)
 	defer func(db *sql.DB) {
 		er := db.Close()
@@ -90,13 +116,13 @@ func main() {
 	accntSvc := accountSvc.New(accountStore)
 
 	// Handler Layer
-	assignmentHandler := aHandler.New(assgnmntSvc)
-	//accountHandler := accntHandler.New(accntSvc)
+	assignmentHandler := aHandler.New(ctx, assgnmntSvc)
+	//accountHandler := accntHandler.New(ctx, accntSvc)
 
 	// Load test user accounts from a given file
 	fileName := os.Getenv("USER_DATA_FILE_PATH")
 	if err == nil {
-		if err = accntSvc.BulkInsert(fileName); err != nil {
+		if err = accntSvc.BulkInsert(ctx, fileName); err != nil {
 			fmt.Printf("ERROR: Loading users data to database failed with error %v", err.Error())
 			//panic(errors.NewCustomError(err))
 		}
@@ -105,6 +131,9 @@ func main() {
 	// Setup router using mux
 	router := mux.NewRouter().StrictSlash(true)
 	router.MethodNotAllowedHandler = http.HandlerFunc(MethodNotImplementedHandler)
+	router.Use(middleware.Logging(logger))
+	//router.Use(middleware.BasicAuths(ctx, accntSvc))
+	router.Use(middleware.APICountMetrics(ctx))
 
 	// Health Check Route
 	router.HandleFunc("/healthz", HealthCheckHandler).Methods("GET")
@@ -113,11 +142,11 @@ func main() {
 	//router.HandleFunc("/v1/account", accountHandler.Insert).Methods("POST")
 
 	// Assignments Routes
-	router.Handle("/v1/assignments", middleware.NewBasicAuth(assignmentHandler.Get, accntSvc)).Methods("GET")
-	router.Handle("/v1/assignments", middleware.NewBasicAuth(assignmentHandler.Insert, accntSvc)).Methods("POST")
-	router.Handle("/v1/assignments/{id}", middleware.NewBasicAuth(assignmentHandler.GetById, accntSvc)).Methods("GET")
-	router.Handle("/v1/assignments/{id}", middleware.NewBasicAuth(assignmentHandler.Modify, accntSvc)).Methods("PUT")
-	router.Handle("/v1/assignments/{id}", middleware.NewBasicAuth(assignmentHandler.Delete, accntSvc)).Methods("DELETE")
+	router.Handle("/v1/assignments", middleware.NewBasicAuth(ctx, assignmentHandler.Get, accntSvc)).Methods("GET")
+	router.Handle("/v1/assignments", middleware.NewBasicAuth(ctx, assignmentHandler.Insert, accntSvc)).Methods("POST")
+	router.Handle("/v1/assignments/{id}", middleware.NewBasicAuth(ctx, assignmentHandler.GetById, accntSvc)).Methods("GET")
+	router.Handle("/v1/assignments/{id}", middleware.NewBasicAuth(ctx, assignmentHandler.Modify, accntSvc)).Methods("PUT")
+	router.Handle("/v1/assignments/{id}", middleware.NewBasicAuth(ctx, assignmentHandler.Delete, accntSvc)).Methods("DELETE")
 
 	// Start the server
 	port := os.Getenv("PORT")
@@ -162,18 +191,21 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 		if er != nil {
 			SetNoCacheResponseHeaders(w)
 			w.WriteHeader(http.StatusServiceUnavailable)
+			return
 		}
 	}(db)
 
 	if err != nil {
 		SetNoCacheResponseHeaders(w)
 		w.WriteHeader(http.StatusServiceUnavailable)
+		return
 	}
 
 	err = db.Ping()
 	if err != nil {
 		SetNoCacheResponseHeaders(w)
 		w.WriteHeader(http.StatusServiceUnavailable)
+		return
 	}
 
 	SetNoCacheResponseHeaders(w)
@@ -184,6 +216,7 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 func MethodNotImplementedHandler(w http.ResponseWriter, r *http.Request) {
 	SetNoCacheResponseHeaders(w)
 	w.WriteHeader(http.StatusMethodNotAllowed)
+	return
 }
 
 func SetNoCacheResponseHeaders(w http.ResponseWriter) {

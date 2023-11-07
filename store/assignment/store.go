@@ -3,6 +3,7 @@ package assignment
 import (
 	"database/sql"
 	cr "errors"
+	"github.com/shivasaicharanruthala/webapp/types"
 
 	"github.com/shivasaicharanruthala/webapp/errors"
 	"github.com/shivasaicharanruthala/webapp/model"
@@ -17,7 +18,7 @@ func New(db *sql.DB) store.Assignment {
 	return &assignmentStore{DB: db}
 }
 
-func (a *assignmentStore) Get(userID string) ([]*model.AssignmentResponse, error) {
+func (a *assignmentStore) Get(ctx *types.Context, userID string) ([]*model.AssignmentResponse, error) {
 	var assignments = []*model.AssignmentResponse{}
 
 	rows, err := a.DB.Query(GetQuery)
@@ -39,7 +40,7 @@ func (a *assignmentStore) Get(userID string) ([]*model.AssignmentResponse, error
 	return assignments, nil
 }
 
-func (a *assignmentStore) GetById(assignmentID string) (*model.AssignmentResponse, error) {
+func (a *assignmentStore) GetById(ctx *types.Context, assignmentID string) (*model.AssignmentResponse, error) {
 	row := a.DB.QueryRow(GetByIDQuery, assignmentID)
 	if row.Err() != nil {
 		return nil, errors.NewCustomError(row.Err())
@@ -57,7 +58,7 @@ func (a *assignmentStore) GetById(assignmentID string) (*model.AssignmentRespons
 	return &assignment, nil
 }
 
-func (a *assignmentStore) IfExists(assignmentID string) (*model.User, error) {
+func (a *assignmentStore) IfExists(ctx *types.Context, assignmentID string) (*model.User, error) {
 	row := a.DB.QueryRow(IsAssignmentExistsQuery, assignmentID)
 	if row.Err() != nil {
 		return nil, errors.NewCustomError(row.Err())
@@ -75,7 +76,7 @@ func (a *assignmentStore) IfExists(assignmentID string) (*model.User, error) {
 	return &user, nil
 }
 
-func (a *assignmentStore) Insert(assignment *model.Assignment) error {
+func (a *assignmentStore) Insert(ctx *types.Context, assignment *model.Assignment) error {
 	_, err := a.DB.Exec(InsertQuery, assignment.ID, assignment.AccountID, *assignment.Name, *assignment.Points, *assignment.NoOfAttempts, *assignment.Deadline, assignment.AssignmentCreated, assignment.AssignmentUpdated)
 	if err != nil {
 		return errors.NewCustomError(err)
@@ -84,7 +85,7 @@ func (a *assignmentStore) Insert(assignment *model.Assignment) error {
 	return nil
 }
 
-func (a *assignmentStore) Modify(assignment *model.Assignment) error {
+func (a *assignmentStore) Modify(ctx *types.Context, assignment *model.Assignment) error {
 	res, err := a.DB.Exec(UpdateQuery, *assignment.Name, *assignment.Points, *assignment.NoOfAttempts, *assignment.Deadline, assignment.AssignmentUpdated, assignment.ID)
 	if err != nil {
 		return errors.NewCustomError(err)
@@ -102,7 +103,7 @@ func (a *assignmentStore) Modify(assignment *model.Assignment) error {
 	return nil
 }
 
-func (a *assignmentStore) Delete(assignmentID string) error {
+func (a *assignmentStore) Delete(ctx *types.Context, assignmentID string) error {
 	res, err := a.DB.Exec(DeleteQuery, assignmentID)
 	if err != nil {
 		return errors.NewCustomError(err)

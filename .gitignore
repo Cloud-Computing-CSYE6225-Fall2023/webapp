@@ -8,8 +8,21 @@
 .env
 *.so
 *.dylib
+
+# idea files
 .idea
+
+# go dependencies
 go.sum
+
+# log files
+*.log
+
+# Zip files
+*.zip
+
+# build files
+webapp
 .
 # Test binary, built with `go test -c`
 *.test
@@ -22,4 +35,6 @@ go.sum
 
 # Go workspace file
 go.work
+
+# mac files
 .DS_Store

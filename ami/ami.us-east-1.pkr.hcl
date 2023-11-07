@@ -117,6 +117,8 @@ build {
       "sudo apt-get upgrade -y",
       "sudo apt-get clean",
       "sudo apt install unzip -y",
+      "wget https://amazoncloudwatch-agent.s3.amazonaws.com/debian/amd64/latest/amazon-cloudwatch-agent.deb",
+      "sudo dpkg -i -E ./amazon-cloudwatch-agent.deb"
     ]
   }
 
@@ -134,6 +136,7 @@ build {
       "sudo chmod +x ./startup-scripts/setup-go.sh ./startup-scripts/setup-postgres.sh ./startup-scripts/setup-gopath.sh ./startup-scripts/service-startup.sh",
       "sudo ./startup-scripts/setup-go.sh",
       ". ./startup-scripts/setup-gopath.sh",
+      #      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/ec2-user/webapp/observability-config.json -s",
       #      "sudo ./startup-scripts/setup-postgres.sh -u ${var.db_user} -p ${var.db_password} -d ${var.db_name}",
       "sudo ./startup-scripts/service-startup.sh",
     ]

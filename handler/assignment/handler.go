@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/shivasaicharanruthala/webapp/errors"
+	"github.com/shivasaicharanruthala/webapp/types"
 	"io"
 	"net/http"
 
@@ -13,11 +14,12 @@ import (
 )
 
 type assignmentService struct {
+	ctx               *types.Context
 	assignmentService service.Assignment
 }
 
-func New(assignmentSvc service.Assignment) *assignmentService {
-	return &assignmentService{assignmentService: assignmentSvc}
+func New(ctx *types.Context, assignmentSvc service.Assignment) *assignmentService {
+	return &assignmentService{ctx: ctx, assignmentService: assignmentSvc}
 }
 
 func (a *assignmentService) Get(w http.ResponseWriter, r *http.Request, user *model.User) {
@@ -38,9 +40,9 @@ func (a *assignmentService) Get(w http.ResponseWriter, r *http.Request, user *mo
 		return
 	}
 
-	assignments, err := a.assignmentService.Get(user.ID)
+	assignments, err := a.assignmentService.Get(a.ctx, user.ID)
 	if err != nil {
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
@@ -68,13 +70,13 @@ func (a *assignmentService) GetById(w http.ResponseWriter, r *http.Request, user
 
 	assignmentID := mux.Vars(r)["id"]
 	if err = model.ValidateID(assignmentID); err != nil {
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
-	assignment, err := a.assignmentService.GetById(user.ID, assignmentID)
+	assignment, err := a.assignmentService.GetById(a.ctx, user.ID, assignmentID)
 	if err != nil {
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
@@ -88,21 +90,21 @@ func (a *assignmentService) Insert(w http.ResponseWriter, r *http.Request, user 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		err = errors.NewCustomError(err, 400)
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
 	err = json.Unmarshal(body, &assignment)
 	if err != nil {
 		err = errors.NewCustomError(err, 400)
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
 	assignment.SetAccountID(user.ID)
-	assignmentResp, err := a.assignmentService.Insert(&assignment)
+	assignmentResp, err := a.assignmentService.Insert(a.ctx, &assignment)
 	if err != nil {
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
@@ -115,29 +117,29 @@ func (a *assignmentService) Modify(w http.ResponseWriter, r *http.Request, user 
 
 	assignmentID := mux.Vars(r)["id"]
 	if err := model.ValidateID(assignmentID); err != nil {
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		err = errors.NewCustomError(err, 400)
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
 	err = json.Unmarshal(body, &assignment)
 	if err != nil {
 		err = errors.NewCustomError(err, 400)
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
 	assignment.SetAccountID(user.ID)
 	assignment.ID = assignmentID
-	_, err = a.assignmentService.Modify(&assignment)
+	_, err = a.assignmentService.Modify(a.ctx, &assignment)
 	if err != nil {
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
@@ -148,12 +150,12 @@ func (a *assignmentService) Modify(w http.ResponseWriter, r *http.Request, user 
 func (a *assignmentService) Delete(w http.ResponseWriter, r *http.Request, user *model.User) {
 	assignmentID := mux.Vars(r)["id"]
 	if err := model.ValidateID(assignmentID); err != nil {
-		responder.SetErrorResponse(err, w)
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 
-	if err := a.assignmentService.Delete(user.ID, assignmentID); err != nil {
-		responder.SetErrorResponse(err, w)
+	if err := a.assignmentService.Delete(a.ctx, user.ID, assignmentID); err != nil {
+		responder.SetErrorResponse(err, w, r)
 		return
 	}
 

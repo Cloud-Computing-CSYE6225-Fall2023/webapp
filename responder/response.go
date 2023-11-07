@@ -1,13 +1,21 @@
 package responder
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
 	"github.com/shivasaicharanruthala/webapp/errors"
 )
 
-func SetErrorResponse(err error, w http.ResponseWriter) {
+type message string
+
+const ErrorMessage message = "errorMessage"
+
+func SetErrorResponse(err error, w http.ResponseWriter, r *http.Request) {
+	ctx := context.WithValue(r.Context(), ErrorMessage, err.Error())
+	*r = *r.Clone(ctx)
+
 	switch val := err.(type) {
 	case errors.InvalidParam:
 		errJson, _ := json.Marshal(val)

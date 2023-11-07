@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	cr "errors"
 	"fmt"
+	"github.com/shivasaicharanruthala/webapp/types"
 
 	"github.com/shivasaicharanruthala/webapp/errors"
 	"github.com/shivasaicharanruthala/webapp/model"
@@ -20,11 +21,11 @@ func New(db *sql.DB) store.Account {
 
 const ACCOUNTS_TABLE_NAME string = "accounts"
 
-func (acc *accountStore) Insert(account *model.Account) (*model.Account, error) {
+func (acc *accountStore) Insert(ctx *types.Context, account *model.Account) (*model.Account, error) {
 	return nil, nil
 }
 
-func (acc *accountStore) BulkInsert(cols []string, rows [][]string) error {
+func (acc *accountStore) BulkInsert(ctx *types.Context, cols []string, rows [][]string) error {
 	insertQuery := generateBulkInsertQuery(ACCOUNTS_TABLE_NAME, cols, len(rows))
 
 	// Insert the record into the database (replace with your SQL)
@@ -37,7 +38,7 @@ func (acc *accountStore) BulkInsert(cols []string, rows [][]string) error {
 	return nil
 }
 
-func (acc *accountStore) IsAccountExists(email string) (*model.Account, error) {
+func (acc *accountStore) IsAccountExists(ctx *types.Context, email string) (*model.Account, error) {
 	var account model.Account
 
 	row := acc.DB.QueryRow("SELECT id, email, password FROM accounts WHERE email=$1", email)
@@ -57,7 +58,7 @@ func (acc *accountStore) IsAccountExists(email string) (*model.Account, error) {
 	return &account, nil
 }
 
-func (acc *accountStore) FlushData(tableName string) error {
+func (acc *accountStore) FlushData(ctx *types.Context, tableName string) error {
 	deleteQuery := fmt.Sprintf("DELETE FROM %s", tableName)
 
 	// Execute the delete query

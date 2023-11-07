@@ -83,7 +83,7 @@ jobs:
 
       - name: Zip Dependencies
         run: |
-          zip -r webapp.zip migrations opt startup-scripts webapp
+          zip -r webapp.zip migrations opt startup-scripts webapp observability-config.json
 
       - name: Install Packer
         run: |

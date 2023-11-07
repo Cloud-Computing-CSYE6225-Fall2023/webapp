@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	cr "errors"
 	"fmt"
+	"github.com/shivasaicharanruthala/webapp/types"
 	"log"
 	"os"
 
@@ -21,11 +22,11 @@ func New(accdb store.Account) service.Account {
 	return &dataStore{accountStore: accdb}
 }
 
-func (a *dataStore) Insert(account *model.Account) (*model.Account, error) {
+func (a *dataStore) Insert(ctx *types.Context, account *model.Account) (*model.Account, error) {
 	return nil, nil
 }
 
-func (a *dataStore) BulkInsert(filepath string) error {
+func (a *dataStore) BulkInsert(ctx *types.Context, filepath string) error {
 	cols := []string{}
 	// Open the CSV file for reading
 	csvFile, err := os.Open(filepath)
@@ -71,7 +72,7 @@ func (a *dataStore) BulkInsert(filepath string) error {
 		// If we have accumulated enough rows, insert them in bulk
 		if len(rowsToInsert) == batchSize {
 			// Perform the bulk insert (replace with your database-specific bulk insert query)
-			er := a.accountStore.BulkInsert(cols, rowsToInsert)
+			er := a.accountStore.BulkInsert(ctx, cols, rowsToInsert)
 			if er != nil {
 				return er
 			}
@@ -83,7 +84,7 @@ func (a *dataStore) BulkInsert(filepath string) error {
 
 	// Insert any remaining rows (if less than batchSize)
 	if len(rowsToInsert) > 0 {
-		err = a.accountStore.BulkInsert(cols, rowsToInsert)
+		err = a.accountStore.BulkInsert(ctx, cols, rowsToInsert)
 		if err != nil {
 			return err
 		}
@@ -93,14 +94,14 @@ func (a *dataStore) BulkInsert(filepath string) error {
 	return nil
 }
 
-func (a *dataStore) IsAccountExists(email, pass string) (*model.User, error) {
+func (a *dataStore) IsAccountExists(ctx *types.Context, email, pass string) (*model.User, error) {
 	var user model.User
 
 	if err := model.ValidateEmail(email); err != nil {
 		return nil, errors.NewCustomError(errors.InvalidParam{Param: []string{"username"}}, 401)
 	}
 
-	account, err := a.accountStore.IsAccountExists(email)
+	account, err := a.accountStore.IsAccountExists(ctx, email)
 	if err != nil {
 		if err.Error() == "Username does not exists" {
 			return nil, errors.NewCustomError(cr.New("Username does not exists"), 401)

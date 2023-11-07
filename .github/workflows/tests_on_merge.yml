@@ -22,6 +22,7 @@ jobs:
       DRIVER_NAME: ${{ vars.DRIVER_NAME }}
       USER_DATA_FILE_PATH: ${{ vars.USER_DATA_FILE_PATH }}
       MIGRATION_FILE_PATH: ${{ vars.MIGRATION_FILE_PATH }}
+      LOG_FILE_PATH: ${{ vars.LOG_FILE_PATH }}
 
     services:
       postgres:

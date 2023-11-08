@@ -40,7 +40,7 @@ func Logging(logger *log.CustomLogger) func(inner http.Handler) http.Handler {
 				l.ErrorMessage = populateErrorMessage(r, res.status)
 
 				if logger.Logger != nil {
-					isServerError := res.status >= http.StatusInternalServerError && res.status <= http.StatusNetworkAuthenticationRequired
+					isServerError := (res.status >= http.StatusBadRequest && res.status <= http.StatusUnavailableForLegalReasons) || (res.status >= http.StatusInternalServerError && res.status <= http.StatusNetworkAuthenticationRequired)
 
 					if isServerError {
 						l.Level = "ERROR"

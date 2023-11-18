@@ -4,12 +4,10 @@ on:
   pull_request:
     branches:
       - main
-    types:
-      - closed
 
 jobs:
   setup-go:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.head.repo.fork
     name: setup-go
     runs-on: ubuntu-20.04
     env:

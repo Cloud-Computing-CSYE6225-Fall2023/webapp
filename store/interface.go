@@ -12,6 +12,11 @@ type Assignment interface {
 	Insert(*types.Context, *model.Assignment) error
 	Modify(*types.Context, *model.Assignment) error
 	Delete(ctx *types.Context, assignmentID string) error
+	GetAssignmentSubmissionCount(ctx *types.Context, assignmentID string) (*model.AssignmentResponse, error)
+
+	// Assignment Submission methods
+	CheckSubmissions(ctx *types.Context, userID, assignmentID string) (*int, error)
+	PostAssignment(ctx *types.Context, submission *model.Submission) error
 }
 
 type Account interface {

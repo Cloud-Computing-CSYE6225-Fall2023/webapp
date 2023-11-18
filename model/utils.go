@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"regexp"
 
 	"github.com/shivasaicharanruthala/webapp/errors"
@@ -30,4 +31,9 @@ func HashPassword(password string) (string, error) {
 	}
 
 	return string(hashedPassword), nil
+}
+
+func IsValidUUID(uuidStr string) bool {
+	_, err := uuid.Parse(uuidStr)
+	return err == nil
 }

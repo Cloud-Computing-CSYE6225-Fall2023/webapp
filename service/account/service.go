@@ -3,9 +3,8 @@ package account
 import (
 	"encoding/csv"
 	cr "errors"
-	"fmt"
+	"github.com/shivasaicharanruthala/webapp/log"
 	"github.com/shivasaicharanruthala/webapp/types"
-	"log"
 	"os"
 
 	"github.com/shivasaicharanruthala/webapp/errors"
@@ -36,7 +35,9 @@ func (a *dataStore) BulkInsert(ctx *types.Context, filepath string) error {
 	defer func(csvFile *os.File) {
 		err = csvFile.Close()
 		if err != nil {
-			log.Println("Error closing the file")
+			lm := log.Message{Level: "ERROR", ErrorMessage: "Error closing the users.csv file"}
+			ctx.Logger.Log(&lm)
+
 			return
 		}
 	}(csvFile)
@@ -90,7 +91,9 @@ func (a *dataStore) BulkInsert(ctx *types.Context, filepath string) error {
 		}
 	}
 
-	fmt.Println("Bulk insert completed successfully.")
+	lm := log.Message{Level: "INFO", ErrorMessage: "Bulk insert from users.csv completed successfully"}
+	ctx.Logger.Log(&lm)
+
 	return nil
 }
 

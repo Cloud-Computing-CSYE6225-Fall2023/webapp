@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/shivasaicharanruthala/webapp/errors"
+	"github.com/shivasaicharanruthala/webapp/model"
 )
 
 func getEmailAndPassword(authHeader string) (email, pass string, err error) {
@@ -27,4 +28,18 @@ func getEmailAndPassword(authHeader string) (email, pass string, err error) {
 	}
 
 	return pair[0], pair[1], nil
+}
+
+func maskPathParams(url string) string {
+	pathSegments := strings.Split(url, "/")
+
+	// Mask path parameters if there are any.
+	for i, segment := range pathSegments {
+
+		if model.IsValidUUID(segment) {
+			pathSegments[i] = "{id}"
+		}
+	}
+
+	return strings.Join(pathSegments, "/")
 }

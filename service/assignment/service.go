@@ -2,6 +2,7 @@ package assignment
 
 import (
 	cr "errors"
+	"fmt"
 	"github.com/shivasaicharanruthala/webapp/types"
 
 	"github.com/shivasaicharanruthala/webapp/errors"
@@ -83,4 +84,40 @@ func (a *dataStore) Delete(ctx *types.Context, userID, assignmentID string) erro
 	}
 
 	return a.assignmentStore.Delete(ctx, assignmentID)
+}
+
+func (a *dataStore) PostSubmission(ctx *types.Context, submission *model.Submission) (*model.SubmissionResponse, error) {
+	if err := submission.ValidateSubmissionURL(); err != nil {
+		return nil, err
+	}
+
+	submission.SetID()
+	submission.SetTimestamps()
+
+	assignment, err := a.assignmentStore.GetAssignmentSubmissionCount(ctx, submission.AssignmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	noOfSubmissions, err := a.assignmentStore.CheckSubmissions(ctx, submission.AssignmentID, submission.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	if *noOfSubmissions+1 > *assignment.NoOfAttempts {
+		return nil, errors.NewCustomError(cr.New(fmt.Sprintf("No of submissions for assignment %v must be not greater than %v", submission.AssignmentID, *assignment.NoOfAttempts)), 400)
+	}
+
+	if submission.Created.After(*assignment.Deadline) {
+		return nil, errors.NewCustomError(cr.New(fmt.Sprintf("Deadline for assignment %v is %v UTC", submission.AssignmentID, assignment.Deadline)), 400)
+	}
+
+	err = a.assignmentStore.PostAssignment(ctx, submission)
+	if err != nil {
+		return nil, err
+	}
+
+	//TODO: Post to SNS Topic with submission url and user data
+
+	return submission.ConvertToResponse(), nil
 }

@@ -120,3 +120,48 @@ func (a *assignmentStore) Delete(ctx *types.Context, assignmentID string) error 
 
 	return nil
 }
+
+func (a *assignmentStore) GetAssignmentSubmissionCount(ctx *types.Context, assignmentID string) (*model.AssignmentResponse, error) {
+	row := a.DB.QueryRow(GetAssignmentSubmissionQuery, assignmentID)
+	if row.Err() != nil {
+		return nil, errors.NewCustomError(row.Err())
+	}
+
+	var assignment model.AssignmentResponse
+	if err := row.Scan(&assignment.NoOfAttempts, &assignment.Deadline); err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return nil, errors.NewEntityNotFound(errors.EntityNotFound{Entity: "assignments", ID: assignmentID})
+		}
+
+		return nil, errors.NewCustomError(err)
+	}
+
+	return &assignment, nil
+}
+
+func (a *assignmentStore) CheckSubmissions(ctx *types.Context, userID, assignmentID string) (*int, error) {
+	row := a.DB.QueryRow(CheckSubmissionsQuery, userID, assignmentID)
+	if row.Err() != nil {
+		return nil, errors.NewCustomError(row.Err())
+	}
+
+	var submissionCount int
+	if err := row.Scan(&submissionCount); err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return nil, errors.NewEntityNotFound(errors.EntityNotFound{Entity: "submission", ID: assignmentID})
+		}
+
+		return nil, errors.NewCustomError(err)
+	}
+
+	return &submissionCount, nil
+}
+
+func (a *assignmentStore) PostAssignment(ctx *types.Context, submission *model.Submission) error {
+	_, err := a.DB.Exec(InsertSubmissionQuery, submission.ID, submission.UserID, submission.AssignmentID, submission.SubmissionURL, submission.Created, submission.Updated)
+	if err != nil {
+		return errors.NewCustomError(err)
+	}
+
+	return nil
+}

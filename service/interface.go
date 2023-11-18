@@ -6,11 +6,15 @@ import (
 )
 
 type Assignment interface {
+	// Assignment Creation Methods
 	Get(ctx *types.Context, userID string) ([]*model.AssignmentResponse, error)
 	GetById(ctx *types.Context, userID, assignmentID string) (*model.AssignmentResponse, error)
 	Insert(*types.Context, *model.Assignment) (*model.AssignmentResponse, error)
 	Modify(*types.Context, *model.Assignment) (*model.AssignmentResponse, error)
 	Delete(ctx *types.Context, userID, assignmentID string) error
+
+	// Assignment Submission Methods
+	PostSubmission(ctx *types.Context, submission *model.Submission) (*model.SubmissionResponse, error)
 }
 
 type Account interface {

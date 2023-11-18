@@ -162,3 +162,39 @@ func (a *assignmentService) Delete(w http.ResponseWriter, r *http.Request, user 
 	w.WriteHeader(204)
 	return
 }
+
+func (a *assignmentService) PostAssignmentSubmission(w http.ResponseWriter, r *http.Request, user *model.User) {
+	var submission model.Submission
+
+	assignmentID := mux.Vars(r)["id"]
+	if err := model.ValidateID(assignmentID); err != nil {
+		responder.SetErrorResponse(err, w, r)
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		err = errors.NewCustomError(err, 400)
+		responder.SetErrorResponse(err, w, r)
+		return
+	}
+
+	err = json.Unmarshal(body, &submission)
+	if err != nil {
+		err = errors.NewCustomError(err, 400)
+		responder.SetErrorResponse(err, w, r)
+		return
+	}
+
+	submission.SetAssignmentID(assignmentID)
+	submission.SetUserID(user.ID)
+
+	submissionResp, err := a.assignmentService.PostSubmission(a.ctx, &submission)
+	if err != nil {
+		responder.SetErrorResponse(err, w, r)
+		return
+	}
+
+	responder.SetResponse(submissionResp, 201, w)
+	return
+}

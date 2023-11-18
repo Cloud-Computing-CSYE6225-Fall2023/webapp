@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"github.com/google/uuid"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/shivasaicharanruthala/webapp/log"
 	"github.com/shivasaicharanruthala/webapp/responder"
 )

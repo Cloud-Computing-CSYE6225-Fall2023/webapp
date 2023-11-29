@@ -1,64 +1,51 @@
-package main
+package publish
 
 import (
 	"context"
-	"flag"
-	"fmt"
+	er "errors"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
+	"github.com/shivasaicharanruthala/webapp/errors"
+	"github.com/shivasaicharanruthala/webapp/log"
+	"os"
 )
 
-// SNSPublishAPI defines the interface for the Publish function.
-// We use this interface to test the function using a mocked service.
 type SNSPublishAPI interface {
-	Publish(ctx context.Context, params *sns.PublishInput, optFns ...func(*sns.Options)) (*sns.PublishOutput, error)
+	Publish(message []byte, attributes map[string]interface{}) (*sns.PublishOutput, error)
 }
 
-// PublishMessage publishes a message to an Amazon Simple Notification Service (Amazon SNS) topic
-// Inputs:
-//
-//	c is the context of the method call, which includes the Region
-//	api is the interface that defines the method call
-//	input defines the input arguments to the service call.
-//
-// Output:
-//
-//	If success, a PublishOutput object containing the result of the service call and nil
-//	Otherwise, nil and an error from the call to Publish
-func PublishMessage(c context.Context, api SNSPublishAPI, input *sns.PublishInput) (*sns.PublishOutput, error) {
-	return api.Publish(c, input)
-}
-
-func main() {
-	msg := flag.String("m", "hi", "The message to send to the subscribed users of the topic")
-	topicARN := flag.String("t", "arn:aws:sns:us-east-1:394598842451:test.fifo", "The ARN of the topic to which the user subscribes")
-
-	flag.Parse()
-
-	if *msg == "" || *topicARN == "" {
-		fmt.Println("You must supply a message and topic ARN")
-		fmt.Println("-m MESSAGE -t TOPIC-ARN")
-		return
-	}
-
+func New(logger *log.CustomLogger) (SNSPublishAPI, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		panic("configuration error, " + err.Error())
+		return nil, err
 	}
 
-	client := sns.NewFromConfig(cfg)
+	return &Event{
+		logger: logger,
+		client: sns.NewFromConfig(cfg),
+	}, nil
+}
+
+type Event struct {
+	logger *log.CustomLogger
+	client *sns.Client
+}
+
+func (e *Event) Publish(message []byte, attributes map[string]interface{}) (*sns.PublishOutput, error) {
+	topicArn := os.Getenv("TOPIC_ARN")
+	msg := string(message)
+
+	if msg == "" || topicArn == "" {
+		lm := log.Message{Level: "ERROR", ErrorMessage: "Message or Topic not provided"}
+		e.logger.Log(&lm)
+
+		return nil, errors.NewCustomError(er.New("message or Topic not provided"))
+	}
 
 	input := &sns.PublishInput{
-		Message:  msg,
-		TopicArn: topicARN,
+		Message:  &msg,
+		TopicArn: &topicArn,
 	}
 
-	result, err := PublishMessage(context.TODO(), client, input)
-	if err != nil {
-		fmt.Println("Got an error publishing the message:")
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println("Message ID: " + *result.MessageId)
+	return e.client.Publish(context.TODO(), input)
 }

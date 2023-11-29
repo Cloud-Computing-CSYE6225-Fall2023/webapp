@@ -12,6 +12,8 @@ const UpdateQuery = "UPDATE assignments SET name=$1, points=$2, num_of_attemps=$
 
 const DeleteQuery = "DELETE FROM assignments WHERE id=$1"
 
+const DeleteAssignmentSubmissions = "DELETE FROM submissions WHERE assignment_id=$1"
+
 const GetAssignmentSubmissionQuery = "SELECT num_of_attemps, deadline FROM assignments WHERE id=$1"
 
 // Assignment Submission Queries

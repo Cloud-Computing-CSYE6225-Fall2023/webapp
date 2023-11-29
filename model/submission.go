@@ -8,7 +8,7 @@ import (
 
 type Submission struct {
 	ID            string    `json:"-"`
-	UserID        string    `json:"-"`
+	User          User      `json:"-"`
 	AssignmentID  string    `json:"-"`
 	SubmissionURL *string   `json:"submission_url"`
 	Created       time.Time `json:"-"`
@@ -17,11 +17,20 @@ type Submission struct {
 
 type SubmissionResponse struct {
 	ID            string    `json:"id"`
-	UserID        string    `json:"-"`
+	User          User      `json:"-"`
 	AssignmentID  string    `json:"assignment_id"`
 	SubmissionURL string    `json:"submission_url"`
 	Created       time.Time `json:"submission_date"`
-	Updated       time.Time `json:"assignment_updated"`
+	Updated       time.Time `json:"submission_updated"`
+}
+
+type PublishSubmission struct {
+	ID            string    `json:"id"`
+	User          User      `json:"user"`
+	AssignmentID  string    `json:"assignment_id"`
+	SubmissionURL string    `json:"submission_url"`
+	Created       time.Time `json:"submission_date"`
+	Updated       time.Time `json:"submission_updated"`
 }
 
 func (s *Submission) ValidateSubmissionURL() error {
@@ -45,14 +54,25 @@ func (s *Submission) SetAssignmentID(assignmentID string) {
 	s.AssignmentID = assignmentID
 }
 
-func (s *Submission) SetUserID(userID string) {
-	s.UserID = userID
+func (s *Submission) SetUser(user User) {
+	s.User = user
 }
 
 func (s *Submission) ConvertToResponse() *SubmissionResponse {
 	return &SubmissionResponse{
 		ID:            s.ID,
-		UserID:        s.UserID,
+		User:          s.User,
+		AssignmentID:  s.AssignmentID,
+		SubmissionURL: *s.SubmissionURL,
+		Created:       s.Created,
+		Updated:       s.Updated,
+	}
+}
+
+func (s *Submission) ConvertToPublishResponse() *PublishSubmission {
+	return &PublishSubmission{
+		ID:            s.ID,
+		User:          s.User,
 		AssignmentID:  s.AssignmentID,
 		SubmissionURL: *s.SubmissionURL,
 		Created:       s.Created,

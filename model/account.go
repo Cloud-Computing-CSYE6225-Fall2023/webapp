@@ -18,8 +18,8 @@ type Account struct {
 }
 
 type User struct {
-	ID    string
-	Email string
+	ID    string `json:"id,omitempty"`
+	Email string `json:"email,omitempty"`
 }
 
 func (a *Account) Validate() error {

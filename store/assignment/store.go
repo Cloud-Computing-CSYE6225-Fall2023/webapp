@@ -104,9 +104,28 @@ func (a *assignmentStore) Modify(ctx *types.Context, assignment *model.Assignmen
 }
 
 func (a *assignmentStore) Delete(ctx *types.Context, assignmentID string) error {
-	res, err := a.DB.Exec(DeleteQuery, assignmentID)
+	// Start a transaction
+	tx, err := a.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Delete all submissions linked to a specific assignment
+	_, err = tx.Exec(DeleteAssignmentSubmissions, assignmentID)
 	if err != nil {
 		return errors.NewCustomError(err)
+	}
+
+	// Delete assignment with a specific assignmentId
+	res, err := tx.Exec(DeleteQuery, assignmentID)
+	if err != nil {
+		return errors.NewCustomError(err)
+	}
+
+	// Commit the transaction if everything is successful
+	err = tx.Commit()
+	if err != nil {
+		return err
 	}
 
 	rowsAffected, err := res.RowsAffected()
@@ -158,7 +177,7 @@ func (a *assignmentStore) CheckSubmissions(ctx *types.Context, userID, assignmen
 }
 
 func (a *assignmentStore) PostAssignment(ctx *types.Context, submission *model.Submission) error {
-	_, err := a.DB.Exec(InsertSubmissionQuery, submission.ID, submission.UserID, submission.AssignmentID, submission.SubmissionURL, submission.Created, submission.Updated)
+	_, err := a.DB.Exec(InsertSubmissionQuery, submission.ID, submission.User.ID, submission.AssignmentID, submission.SubmissionURL, submission.Created, submission.Updated)
 	if err != nil {
 		return errors.NewCustomError(err)
 	}

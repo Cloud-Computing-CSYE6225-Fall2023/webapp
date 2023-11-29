@@ -91,7 +91,7 @@ func (a *dataStore) BulkInsert(ctx *types.Context, filepath string) error {
 		}
 	}
 
-	lm := log.Message{Level: "INFO", ErrorMessage: "Bulk insert from users.csv completed successfully"}
+	lm := log.Message{Level: "INFO", Msg: "Bulk insert from users.csv completed successfully"}
 	ctx.Logger.Log(&lm)
 
 	return nil

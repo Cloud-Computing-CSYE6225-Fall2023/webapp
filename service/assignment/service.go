@@ -1,8 +1,10 @@
 package assignment
 
 import (
+	"encoding/json"
 	cr "errors"
 	"fmt"
+	"github.com/shivasaicharanruthala/webapp/log"
 	"github.com/shivasaicharanruthala/webapp/types"
 
 	"github.com/shivasaicharanruthala/webapp/errors"
@@ -99,7 +101,7 @@ func (a *dataStore) PostSubmission(ctx *types.Context, submission *model.Submiss
 		return nil, err
 	}
 
-	noOfSubmissions, err := a.assignmentStore.CheckSubmissions(ctx, submission.AssignmentID, submission.UserID)
+	noOfSubmissions, err := a.assignmentStore.CheckSubmissions(ctx, submission.AssignmentID, submission.User.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +119,14 @@ func (a *dataStore) PostSubmission(ctx *types.Context, submission *model.Submiss
 		return nil, err
 	}
 
-	//TODO: Post to SNS Topic with submission url and user data
+	// Publish user & submission data to SNS Topic
+	payload, _ := json.Marshal(submission.ConvertToPublishResponse())
+	_, err = ctx.PublishClient.Publish(payload, nil)
+	if err != nil {
+		lm := log.Message{Level: "ERROR", ErrorMessage: fmt.Sprintf("Failed publishing event to sns topic with error %v", err.Error())}
+		ctx.Logger.Log(&lm)
+		//	return nil, err
+	}
 
 	return submission.ConvertToResponse(), nil
 }

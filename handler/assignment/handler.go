@@ -187,7 +187,7 @@ func (a *assignmentService) PostAssignmentSubmission(w http.ResponseWriter, r *h
 	}
 
 	submission.SetAssignmentID(assignmentID)
-	submission.SetUserID(user.ID)
+	submission.SetUser(*user)
 
 	submissionResp, err := a.assignmentService.PostSubmission(a.ctx, &submission)
 	if err != nil {

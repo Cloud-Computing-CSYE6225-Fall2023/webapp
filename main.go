@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/shivasaicharanruthala/webapp/publish"
 	"io"
 	"net/http"
 	"os"
@@ -74,8 +75,15 @@ func main() {
 	// Initialize MailerSend Client
 	mailerClient := mailer.New()
 
+	// Initialize SNS Client
+	snsClient, err := publish.New(logger)
+	if err != nil {
+		lm = log.Message{Level: "ERROR", ErrorMessage: fmt.Sprintf("Error Initilizing SNS client config with error %v", err.Error())}
+		logger.Log(&lm)
+	}
+
 	// Initialize Context
-	ctx := types.NewContext(logger, metricClient, mailerClient)
+	ctx := types.NewContext(logger, metricClient, mailerClient, snsClient)
 
 	// Initialize DB connection
 	db, err := sql.Open(dbDriver, connectionStr)

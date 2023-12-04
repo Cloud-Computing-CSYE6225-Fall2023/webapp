@@ -174,7 +174,7 @@ jobs:
 
       - name: Query Launch Template Versions
         run: |
-          launch_template_name="${{ vars.WEBAPP_PROJECT_NAME }}-${{ vars.WEBAPP_ACCOUNT }}-lt"
+          launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
           versions=$(aws ec2 describe-launch-template-versions \
             --launch-template-name $launch_template_name \
             --output json \
@@ -240,6 +240,13 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
     steps:
+      - name: Fetch latest AMI
+        id: ami
+        run: |
+          latest_ami_id=$(aws ec2 describe-images --owners private --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' --output text)
+          echo "Latest AMI ID: $latest_ami_id"
+          echo "latest_ami_id=$latest_ami_id" >> $GITHUB_ENV
+
       - name: Retrieve Existing Launch Template Configuration
         run: |
           launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
@@ -274,7 +281,7 @@ jobs:
 
       - name: Query Launch Template Versions
         run: |
-          launch_template_name="${{ vars.WEBAPP_PROJECT_NAME }}-${{ vars.WEBAPP_ACCOUNT }}-lt"
+          launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
           versions=$(aws ec2 describe-launch-template-versions \
             --launch-template-name $launch_template_name \
             --output json \

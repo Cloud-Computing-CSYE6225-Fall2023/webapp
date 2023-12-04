@@ -7,7 +7,7 @@ on:
 
 jobs:
   packer-validation:
-    if: github.event.pull_request.head.repo.fork
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:

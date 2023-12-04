@@ -7,7 +7,7 @@ on:
 
 jobs:
   setup-go:
-    if: github.event.pull_request.head.repo.fork
+    if: github.event.pull_request.merged == true
     name: setup-go
     runs-on: ubuntu-latest
     env:

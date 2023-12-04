@@ -137,7 +137,7 @@ jobs:
         id: ami
         run: |
           latest_ami_id=$(aws ec2 describe-images --owners self --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' --output text)
-          echo "Latest AMI ID: $latest_ami"
+          echo "Latest AMI ID: $latest_ami_id"
           echo "latest_ami_id=$latest_ami_id" >> $GITHUB_ENV
 
       - name: Retrieve Existing Launch Template Configuration

@@ -143,7 +143,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -171,7 +171,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -204,7 +204,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -237,7 +237,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -270,7 +270,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -297,7 +297,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -324,7 +324,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -351,7 +351,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -378,7 +378,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -405,7 +405,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -432,7 +432,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -459,7 +459,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -486,7 +486,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -513,7 +513,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -544,7 +544,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Assignment 01\",\n  \"points\": 10,\n  \"num_of_attempts\": 3,\n  \"deadline\": \"2023-10-29T09:12:33.001Z\"\n}",
+							"raw": "{\n  \"name\": \"Assignment 01\",\n  \"points\": 10,\n  \"num_of_attempts\": 3,\n  \"deadline\": \"2023-12-18T17:35:33.001Z\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -552,7 +552,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -606,7 +606,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -619,12 +619,183 @@
 					"response": []
 				},
 				{
+					"name": "SubmitAssignment - Missing Auth",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "xyz",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "jane.doe@example.com",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}/submission",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"assignments",
+								"{{assignment1ID}}",
+								"submission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SubmitAssignment - Missing Body",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}/submission",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"assignments",
+								"{{assignment1ID}}",
+								"submission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SubmitAssignment - Missing BodyParam",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"submit_ur\": \"http://abc.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}/submission",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"assignments",
+								"{{assignment1ID}}",
+								"submission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SubmitAssignment - Empty Submit URL",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"submission_url\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}/submission",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"assignments",
+								"{{assignment1ID}}",
+								"submission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SubmitAssignment - After Deadline",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"submission_url\": \"http://abc.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}/submission",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"assignments",
+								"{{assignment1ID}}",
+								"submission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SubmitAssignment  [User 1]",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"submission_url\": \"https://github.com/tparikh/myrepo/archive/refs/tags/v1.0.0\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}/submission",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"assignments",
+								"{{assignment1ID}}",
+								"submission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "All Assignments",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -657,7 +828,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments",
+							"raw": "{{BASE_URL}}/v2/assignments",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -675,7 +846,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -709,7 +880,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment2ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment2ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -728,7 +899,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/9abf3358-5390-4522-a7e9-9cfbe27ea460",
+							"raw": "{{BASE_URL}}/v2/assignments/9abf3358-5390-4522-a7e9-9cfbe27ea460",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -747,7 +918,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/9abf3358-5390-",
+							"raw": "{{BASE_URL}}/v2/assignments/9abf3358-5390-",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -775,7 +946,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -803,7 +974,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -831,7 +1002,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -859,7 +1030,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -887,7 +1058,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -915,7 +1086,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -943,7 +1114,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -971,7 +1142,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/9abf3358-5390-",
+							"raw": "{{BASE_URL}}/v2/assignments/9abf3358-5390-",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -999,7 +1170,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/9abf3358-5390-4522-a7e9-9cfbe27ea460",
+							"raw": "{{BASE_URL}}/v2/assignments/9abf3358-5390-4522-a7e9-9cfbe27ea460",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -1019,7 +1190,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Assignment 02\",\n  \"points\": 10,\n  \"num_of_attempts\": 3,\n  \"deadline\": \"2023-10-29T09:12:33.001Z\"\n}",
+							"raw": "{\n  \"name\": \"Assignment 02\",\n  \"points\": 10,\n  \"num_of_attempts\": 3,\n  \"deadline\": \"2023-11-29T09:12:33.001Z\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1027,7 +1198,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment2ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment2ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -1047,7 +1218,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Assignment 02\",\n  \"points\": 10,\n  \"num_of_attempts\": 3,\n  \"deadline\": \"2023-10-29T09:12:33.001Z\"\n}",
+							"raw": "{\n  \"name\": \"Assignment 02\",\n  \"points\": 10,\n  \"num_of_attempts\": 3,\n  \"deadline\": \"2023-12-29T09:12:33.001Z\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1055,7 +1226,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -1074,7 +1245,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/9abf3358-5390-4522-a7e9-9cfbe27ea460",
+							"raw": "{{BASE_URL}}/v2/assignments/9abf3358-5390-4522-a7e9-9cfbe27ea460",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -1093,7 +1264,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/9abf3358-5390-",
+							"raw": "{{BASE_URL}}/v2/assignments/9abf3358-5390-",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -1112,7 +1283,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment2ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment2ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -1131,7 +1302,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -1150,7 +1321,7 @@
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/v1/assignments/{{assignment1ID}}",
+							"raw": "{{BASE_URL}}/v2/assignments/{{assignment1ID}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
@@ -1169,12 +1340,12 @@
 				"basic": [
 					{
 						"key": "password",
-						"value": "abc123",
+						"value": "test456",
 						"type": "string"
 					},
 					{
 						"key": "username",
-						"value": "john.doe@example.com",
+						"value": "ruthala.shiva512@gmail.com",
 						"type": "string"
 					}
 				]
@@ -1207,7 +1378,7 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"pm.collectionVariables.set(\"BASE_URL\", \"localhost:8080\");"
+					""
 				]
 			}
 		},

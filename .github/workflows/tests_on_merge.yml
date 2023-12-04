@@ -119,3 +119,211 @@ jobs:
         run: |
           cd ami
           packer build ami.us-east-1.pkr.hcl
+
+      - name: Fetch latest AMI
+        id: ami
+        run: |
+          latest_ami_id=$(aws ec2 describe-images --owners "${{ secrets.DEV_AWS_ACCOUNT_ID }}" --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' --output text)
+          echo "Latest AMI ID: $latest_ami"
+          echo "latest_ami_id=$latest_ami_id" >> $GITHUB_ENV
+
+  dev-deployment:
+    needs: setup-go
+    runs-on: ubuntu-20.04
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+    steps:
+      - name: Retrieve Existing Launch Template Configuration
+        shell: bash
+        run: |
+          launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
+          aws ec2 describe-launch-template-versions \
+            --launch-template-name $launch_template_name \
+            --output json \
+            --query "LaunchTemplateVersions[0].LaunchTemplateData" \
+            > launch_template_data.json
+
+      - name: Print Retrieved Launch Template JSON
+        run: cat launch_template_data.json
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Replace AMI ID in Launch Template JSON
+        run: |
+          jq --arg ami_id "$latest_ami_id" \
+            '.ImageId |= $ami_id' launch_template_data.json > updated_launch_template.json
+
+      - name: Print Updated Launch Template JSON
+        run: cat updated_launch_template.json
+
+      - name: Create Launch Template Version
+        run: |
+          launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
+          aws ec2 create-launch-template-version \
+            --launch-template-name $launch_template_name \
+            --launch-template-data file://updated_launch_template.json
+        shell: bash
+
+      - name: Query Launch Template Versions
+        run: |
+          launch_template_name="${{ vars.WEBAPP_PROJECT_NAME }}-${{ vars.WEBAPP_ACCOUNT }}-lt"
+          versions=$(aws ec2 describe-launch-template-versions \
+            --launch-template-name $launch_template_name \
+            --output json \
+            --query "LaunchTemplateVersions[].VersionNumber")
+          latest_version=$(echo $versions | jq -r '.[0]')
+          echo "Latest Launch Template Version: $latest_version"
+          echo "::set-output name=latest_version::$latest_version"
+        id: template
+
+      - name: Set Latest Launch Template Version as Default
+        run: |
+          launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
+          aws ec2 modify-launch-template \
+            --launch-template-name $launch_template_name \
+            --default-version ${{ steps.template.outputs.latest_version }} \
+            --output json
+
+      - name: Start Auto Scaling Group Instance Refresh
+        run: |
+          asg_name="${{ vars.AUTO_SCALING_GROUP_NAME }}"
+          instance_refresh_command_output=$(aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name $asg_name \
+            --preferences MinHealthyPercentage=100 \
+            --output json)
+          instance_refresh_id=$(echo $instance_refresh_command_output | jq -r '.InstanceRefreshId')
+          echo "Instance Refresh ID: $instance_refresh_id"
+          echo "::set-output name=instance_refresh_id::$instance_refresh_id"
+        shell: bash
+        id: instance_refresh
+
+      - name: Wait for Instance Refresh to Complete
+        run: |
+          instance_refresh_id="${{ steps.instance_refresh.outputs.instance_refresh_id }}"
+          asg_name="${{ vars.AUTO_SCALING_GROUP_NAME }}"
+          
+          # Check the status of the instance refresh in a loop
+          while true; do
+            instance_refresh_status=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name $asg_name \
+              --instance-refresh-ids $instance_refresh_id \
+              --query 'InstanceRefreshes[0].Status' \
+              --output json)
+          
+            echo "Instance Refresh Status: $instance_refresh_status"
+          
+            if [ "$instance_refresh_status" == '"Successful"' ]; then
+              echo "Instance Refresh completed successfully."
+              break
+            elif [ "$instance_refresh_status" == '"Cancelled"' ] || [ "$instance_refresh_status" == '"Failed"' ]; then
+              echo "Instance Refresh failed or was cancelled."
+              exit 1
+            else
+              echo "Waiting for Instance Refresh to complete..."
+              sleep 30  # Adjust the sleep interval as needed
+            fi
+          done
+
+  demo-deployment:
+    needs: setup-go
+    runs-on: ubuntu-20.04
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+    steps:
+      - name: Retrieve Existing Launch Template Configuration
+        run: |
+          launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
+          aws ec2 describe-launch-template-versions \
+            --launch-template-name $launch_template_name \
+            --output json \
+            --query "LaunchTemplateVersions[0].LaunchTemplateData" \
+            > launch_template_data.json
+        shell: bash
+
+      - name: Print Retrieved Launch Template JSON
+        run: cat launch_template_data.json
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Replace AMI ID in Launch Template JSON
+        run: |
+          jq --arg ami_id "$latest_ami_id" \
+            '.ImageId |= $ami_id' launch_template_data.json > updated_launch_template.json
+
+      - name: Print Updated Launch Template JSON
+        run: cat updated_launch_template.json
+
+      - name: Create Launch Template Version
+        run: |
+          launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
+          aws ec2 create-launch-template-version \
+            --launch-template-name $launch_template_name \
+            --launch-template-data file://updated_launch_template.json
+        shell: bash
+
+      - name: Query Launch Template Versions
+        run: |
+          launch_template_name="${{ vars.WEBAPP_PROJECT_NAME }}-${{ vars.WEBAPP_ACCOUNT }}-lt"
+          versions=$(aws ec2 describe-launch-template-versions \
+            --launch-template-name $launch_template_name \
+            --output json \
+            --query "LaunchTemplateVersions[].VersionNumber")
+          latest_version=$(echo $versions | jq -r '.[0]')
+          echo "Latest Launch Template Version: $latest_version"
+          echo "::set-output name=latest_version::$latest_version"
+        id: template
+
+      - name: Set Latest Launch Template Version as Default
+        run: |
+          launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
+          aws ec2 modify-launch-template \
+            --launch-template-name $launch_template_name \
+            --default-version ${{ steps.template.outputs.latest_version }} \
+            --output json
+
+      - name: Start Auto Scaling Group Instance Refresh
+        run: |
+          asg_name="${{ vars.AUTO_SCALING_GROUP_NAME }}"
+          instance_refresh_command_output=$(aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name $asg_name \
+            --preferences MinHealthyPercentage=100 \
+            --output json)
+          instance_refresh_id=$(echo $instance_refresh_command_output | jq -r '.InstanceRefreshId')
+          echo "Instance Refresh ID: $instance_refresh_id"
+          echo "::set-output name=instance_refresh_id::$instance_refresh_id"
+        shell: bash
+        id: instance_refresh
+
+      - name: Wait for Instance Refresh to Complete
+        run: |
+          instance_refresh_id="${{ steps.instance_refresh.outputs.instance_refresh_id }}"
+          asg_name="${{ vars.AUTO_SCALING_GROUP_NAME }}"
+
+          # Check the status of the instance refresh in a loop
+          while true; do
+            instance_refresh_status=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name $asg_name \
+              --instance-refresh-ids $instance_refresh_id \
+              --query 'InstanceRefreshes[0].Status' \
+              --output json)
+
+            echo "Instance Refresh Status: $instance_refresh_status"
+
+            if [ "$instance_refresh_status" == '"Successful"' ]; then
+              echo "Instance Refresh completed successfully."
+              break
+            elif [ "$instance_refresh_status" == '"Cancelled"' ] || [ "$instance_refresh_status" == '"Failed"' ]; then
+              echo "Instance Refresh failed or was cancelled."
+              exit 1
+            else
+              echo "Waiting for Instance Refresh to complete..."
+              sleep 30  # Adjust the sleep interval as needed
+            fi
+          done
+

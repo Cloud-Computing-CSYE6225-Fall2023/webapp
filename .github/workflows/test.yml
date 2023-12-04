@@ -21,9 +21,6 @@ jobs:
       USER_DATA_FILE_PATH: ${{ vars.USER_DATA_FILE_PATH }}
       MIGRATION_FILE_PATH: ${{ vars.MIGRATION_FILE_PATH }}
       LOG_FILE_PATH: ${{ vars.LOG_FILE_PATH }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
 
     services:
       postgres:
@@ -122,6 +119,10 @@ jobs:
 #          packer build ami.us-east-1.pkr.hcl
 
       - name: Fetch latest AMI
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
         id: ami
         run: |
           latest_ami_id=$(aws ec2 describe-images --owners self --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' --output text)

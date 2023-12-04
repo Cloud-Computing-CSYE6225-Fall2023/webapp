@@ -192,6 +192,14 @@ jobs:
             --default-version ${{ steps.template.outputs.latest_version }} \
             --output json
 
+      - name: Update Autoscaling group
+        run: |
+          launch_template_name="${{ vars.LAUNCH_TEMPLATE_NAME }}"
+          asg_name="${{ vars.AUTO_SCALING_GROUP_NAME }}"
+          aws autoscaling update-auto-scaling-group \
+          --auto-scaling-group-name $asg_name \
+          --launch-template "LaunchTemplateName=$launch_template_name,Version=${{ steps.template.outputs.latest_version }}"
+
       - name: Start Auto Scaling Group Instance Refresh
         run: |
           asg_name="${{ vars.AUTO_SCALING_GROUP_NAME }}"

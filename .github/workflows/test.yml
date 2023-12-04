@@ -316,6 +316,14 @@ jobs:
         run: |
           instance_refresh_id="${{ steps.instance_refresh.outputs.instance_refresh_id }}"
           asg_name="${{ vars.AUTO_SCALING_GROUP_NAME }}"
+          
+          # Check if there is an instance refresh already in progress
+          existing_instance_refresh=$(aws autoscaling describe-auto-scaling-instances --instance-ids $instance_refresh_id --query 'AutoScalingInstances[0].InstanceRefreshId' --output json)
+          
+          if [ "$existing_instance_refresh" != "null" ]; then
+            echo "Another instance refresh is already in progress. Waiting for it to complete..."
+            exit 0  # Exit gracefully as there is nothing more to do
+          fi
 
           # Check the status of the instance refresh in a loop
           while true; do

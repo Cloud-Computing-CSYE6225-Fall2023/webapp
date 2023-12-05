@@ -22,7 +22,9 @@ func New(logger *log.CustomLogger) (SNSPublishAPI, error) {
 
 	return &Event{
 		logger: logger,
-		client: sns.NewFromConfig(cfg),
+		client: sns.NewFromConfig(cfg, func(o *sns.Options) {
+			o.Region = "us-east-1"
+		}),
 	}, nil
 }
 

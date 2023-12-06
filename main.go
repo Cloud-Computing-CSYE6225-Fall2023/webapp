@@ -165,12 +165,12 @@ func main() {
 	//router.HandleFunc("/v1/account", accountHandler.Insert).Methods("POST")
 
 	// Assignments Routes
-	router.Handle("/v2/assignments", middleware.NewBasicAuth(ctx, assignmentHandler.Get, accntSvc)).Methods("GET")
-	router.Handle("/v2/assignments", middleware.NewBasicAuth(ctx, assignmentHandler.Insert, accntSvc)).Methods("POST")
-	router.Handle("/v2/assignments/{id}", middleware.NewBasicAuth(ctx, assignmentHandler.GetById, accntSvc)).Methods("GET")
-	router.Handle("/v2/assignments/{id}", middleware.NewBasicAuth(ctx, assignmentHandler.Modify, accntSvc)).Methods("PUT")
-	router.Handle("/v2/assignments/{id}", middleware.NewBasicAuth(ctx, assignmentHandler.Delete, accntSvc)).Methods("DELETE")
-	router.Handle("/v2/assignments/{id}/submission", middleware.NewBasicAuth(ctx, assignmentHandler.PostAssignmentSubmission, accntSvc)).Methods("POST")
+	router.Handle("/demo/assignments", middleware.NewBasicAuth(ctx, assignmentHandler.Get, accntSvc)).Methods("GET")
+	router.Handle("/demo/assignments", middleware.NewBasicAuth(ctx, assignmentHandler.Insert, accntSvc)).Methods("POST")
+	router.Handle("/demo/assignments/{id}", middleware.NewBasicAuth(ctx, assignmentHandler.GetById, accntSvc)).Methods("GET")
+	router.Handle("/demo/assignments/{id}", middleware.NewBasicAuth(ctx, assignmentHandler.Modify, accntSvc)).Methods("PUT")
+	router.Handle("/demo/assignments/{id}", middleware.NewBasicAuth(ctx, assignmentHandler.Delete, accntSvc)).Methods("DELETE")
+	router.Handle("/demo/assignments/{id}/submission", middleware.NewBasicAuth(ctx, assignmentHandler.PostAssignmentSubmission, accntSvc)).Methods("POST")
 
 	// Start the server
 	port := os.Getenv("PORT")
